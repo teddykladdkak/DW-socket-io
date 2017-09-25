@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TeddyProjekt - DW server</title>
+	<meta property="og:site_name" content="Digital Whiteboard Server">
+	<meta property="og:title" content="Digital Whiteboard Server">
+	<meta property="og:description" content="Digital Whiteboard projektets server demo.">
+	<meta property="og:url" content="http://www.dwhiteboard.tk/">
+	<meta name="description" content="Digital Whiteboard projektets server demo.">
+	<meta name="keywords" content="sjuksköterska, teddy, projekt, teddyprojekt, slutanteckning, lathund, pillerräknare, pillerraknare, html, css, javascript, jquery, musik, foto, totaltystnad, teddykladdkak, teddy__kladdkaka, teddysweden, eHälsa, eNursing, eHealth, medicinteknik, DW, digital, whiteboard">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<meta content="yes" name="mobile-web-app-capable" />
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+	<link rel="shortcut icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/vnd.microsoft.icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/png" href="filer/icons/icon196x196.png" />
+	<link rel="apple-touch-icon-precomposed" href="filer/icons/icon180x180.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="filer/icons/icon76x76.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="filer/icons/icon120x120.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="filer/icons/icon152x152.png">
+	<link rel="stylesheet" type="text/css" href="http://teddyprojekt.tk/css/main.css">
+	<script type="application/javascript" src="http://teddyprojekt.tk/js/main.js"></script>
+	<style type="text/css">
+		#content{
+			text-align: center;
+		}
+		.information ul{
+			margin-top: 0px;
+		}
+		p{
+			margin-top: 10px;
+		}
+		.information .left{
+			width:40%;
+		}
+		.information .right{
+			text-align: left;
+			width:60%;
+		}
+	</style>
+	<script src="filer/config.js"></script>
+	<script type="text/javascript">
+		function load(){
+			var wrapper = document.getElementById('content');
+			config.cmd.versioner.reverse();
+			for (var i = config.cmd.versioner.length - 1; i >= 0; i--) {
+			/*
+				config.cmd.versioner[i]
+				var head = document.createElement('h3');
+					var headtext = document.createTextNode(config.cmd.versioner[i].namn);
+					head.appendChild(headtext);
+				wrapper.appendChild(head);
+				var link = document.createElement('a');
+					link.setAttribute('href', config.cmd.versioner[i].lank);
+					var linktext = document.createTextNode(document.location.href + config.cmd.versioner[i].lank.replace('/', ''));
+					link.appendChild(linktext);
+				wrapper.appendChild(link);
+				var beskrivning = document.createElement('p');
+					var beskrivningtext = document.createTextNode(config.cmd.versioner[i].beskrivning);
+					beskrivning.appendChild(beskrivningtext);
+				wrapper.appendChild(beskrivning);
+			*/
+				var container = document.createElement('div');
+					container.setAttribute('class', 'tablecontainer information');
+					var row = document.createElement('div');
+						row.setAttribute('class', 'row');
+						var leftcol = document.createElement('div');
+							leftcol.setAttribute('class', 'left');
+							var previewimg = document.createElement('img');
+								previewimg.setAttribute('src', 'filer/preview/' + config.cmd.versioner[i].img);
+								previewimg.setAttribute('width', '90%');
+							leftcol.appendChild(previewimg);
+							var brake = document.createElement('br')
+							leftcol.appendChild(brake);
+							var button = document.createElement('a');
+								button.setAttribute('href', config.cmd.versioner[i].lank);
+								button.setAttribute('class', 'button');
+								button.setAttribute('target', '_blank');
+								var buttontext = document.createTextNode('Till sidan');
+								button.appendChild(buttontext);
+							leftcol.appendChild(button);
+						row.appendChild(leftcol);
+						var rightcol = document.createElement('div');
+							rightcol.setAttribute('class', 'right');
+							var head = document.createElement('span');
+								head.setAttribute('class', 'h3');
+								var headtext = document.createTextNode(config.cmd.versioner[i].namn);
+								head.appendChild(headtext);
+							rightcol.appendChild(head);
+							var info = document.createElement('p');
+								var infotext = document.createTextNode(config.cmd.versioner[i].beskrivning);
+								info.appendChild(infotext);
+							rightcol.appendChild(info);
+						row.appendChild(rightcol);
+					container.appendChild(row);
+				wrapper.appendChild(container);
+			};
+		};
+	</script>
+</head>
+<body onload="load();">
+<div id="meny"><ul><li><a href="http://teddyprojekt.tk/index.html">Start</a></li><li><a href="http://teddyprojekt.tk/vemarjag.html">Vem är jag</a></li><li><a href="http://teddyprojekt.tk/blogg.html">Blogg</a></li><li><a href="http://teddyprojekt.tk/projekt.html" class="active">Projekt</a></li><li><a href="http://teddyprojekt.tk/andraplatser.html">Andra platser</a></li><li><a href="http://teddyprojekt.tk/kontakt.html">Kontakt</a></li></ul></div>
+<span id="mobilemenyicon" onclick="visameny();">&#9776;</span>
+<div id="wrapper">
+	<div id="header">
+		<span class="h1">TeDDy Projekt</span>
+		<span class="h2">Digital Whiteboard Server</span>
+	</div>
+	<div id="content">
+		<div class="tablecontainer">
+			<p>Login namn att använda: "olle", "kajsa", "erik", "ylva", "test".</p>
+		</div>
+	</div>
+</div>
+<div id="footer"><span id="logg">[]</span>&nbsp;¦&nbsp;2016&nbsp;©&nbsp;Mattias Lidbeck&nbsp;¦&nbsp;{<a href="http://www.teddyprojekt.tk/" target="blank" alt="Länk till denna sida">www.teddyprojekt.tk</a>}</div>
+</body>
+</html>

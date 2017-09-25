@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Patient App</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script type="text/javascript">
+		var config = [{
+			key: 'rtg',
+			textfirst: 'Du ska på röntgen ',
+			textlast: ', fråga vårdpersonalen för mer information.',
+			time: true,
+			date: false,
+			merinfo: false
+		},{
+			key: 'test',
+			textfirst: 'Denna text testas',
+			textlast: '.',
+			time: false,
+			date: false,
+			merinfo: false
+		},{
+			key: 'cvk omläggning',
+			textfirst: 'Vi kommer lägga om din centrala venkateter (CVK) idag',
+			textlast: '.',
+			time: false,
+			date: true,
+			merinfo: 'https://www.1177.se/Vastra-Gotaland/Fakta-och-rad/Behandlingar/Central-venkateter---ingress/'
+		}];
+		function searchinfo(info){
+			var wrapper = document.getElementById('text');
+			for (var i = config.length - 1; i >= 0; i--) {
+				var lowerinfo = info.toLowerCase();
+				if(lowerinfo.indexOf(config[i].key) == -1){}else{
+					var time = '';
+					if(config[i].time){
+						var findtime = lookfortime(info);
+						if(findtime != 'none'){
+							var time = 'kl ' + info.split(' ')[findtime];;
+						}else{
+							var time = 'idag'
+						};
+					};
+					if(config[i].date){
+						var findtime = lookfordate(info);
+						if(findtime != 'none'){
+							var datetext = info.split(' ')[findtime];
+							var isittoday = comparetime(datetext, 'none');
+							if(isittoday != 'todayinfo'){
+								return;
+							};
+						};
+					};
+					var textwrapper = document.createElement('p');
+						var maketext = document.createTextNode(config[i].textfirst + time + config[i].textlast);
+						textwrapper.appendChild(maketext);
+						if(config[i].merinfo){
+							var space = document.createTextNode(' ');
+							textwrapper.appendChild(space);
+							var link = document.createElement('a');
+								link.setAttribute('href', config[i].merinfo);
+								link.setAttribute('target', 'blank');
+								var linktext = document.createTextNode('(Mer info)');
+								link.appendChild(linktext);
+							textwrapper.appendChild(link);
+						};
+					wrapper.appendChild(textwrapper);
+				};
+			};
+		};
+		function load(){
+			var test = ['RTG 11:00', 'Dra V-sond ' + datum(), 'Suturtagning ' + datum(), 'CVK omläggning ' + datum(), 'Hb x1', 'Test', 'RTG', 'Kostregistrering'];
+			for (var i = test.length - 1; i >= 0; i--) {
+				searchinfo(test[i]);
+			};
+		};
+	</script>
+</head>
+<body onload="load();">
+<div id="text"></div>
+	<script type="text/javascript">
+		function datum(eventuelltdatum){
+			if(!eventuelltdatum){
+				var d = new Date();
+			}else{
+				var nyyear = eventuelltdatum.split('-')[0];
+				var nymonth = eventuelltdatum.split('-')[1] - 1;
+				var nyday = eventuelltdatum.split('-')[2];
+				var d = new Date(nyyear, nymonth, nyday);
+			};
+			var year = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+			if(day <= 9){var day = '0' + day;};
+			if(month <= 9){var month = '0' + month;};
+			var datetonumber = year + '-' + month + '-' + day;
+			return datetonumber;
+		};
+		function lookfordate(string){
+			var lookfordate = string.split(' ');
+			var todo = 'none';
+			for(g=0;g<lookfordate.length;g++){
+				var lookfordatewords = lookfordate[g].split('-');
+				if(lookfordatewords.length == 3){
+					var year = lookfordatewords[0].replace(/[^\/\d]/g,'');
+					var month = lookfordatewords[1].replace(/[^\/\d]/g,'');
+					var day = lookfordatewords[2].replace(/[^\/\d]/g,'');
+					if(year.split('').length == 4 || year.split('').length == 2){
+						if(month.split('').length == 2){
+							if(month <= 12){
+								if(day.split('').length == 2){
+									if(day <= 32){
+										var todo = g;
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+			return todo;
+		};
+		function lookfortime(string){
+			var lookfortime = string.split(' ');
+			var todo = 'none';
+			for(g=0;g<lookfortime.length;g++){
+				var lookfortimewords = lookfortime[g].split(':');
+				if(lookfortimewords.length == 2){
+					var hour = lookfortimewords[0].replace(/[^\/\d]/g,'');
+					var min = lookfortimewords[1].replace(/[^\/\d]/g,'');
+					if(hour.split('').length == 2){
+						if(hour <= 24){
+							if(min.split('').length == 2){
+								if(min <= 59){
+									var todo = g;
+								};
+							};
+						};
+					};
+				};
+			};
+			return todo;
+		};
+		function comparetime(sattdatum, dagarframtid){
+			var watchdatum = lookfordate(sattdatum);
+			var watchtid = lookfortime(sattdatum);
+			if(watchdatum != 'none'){
+				var samestandard = sattdatum.split('-');
+				if(samestandard[0].split('').length == 2){
+					var sattdatum = '20' + sattdatum;
+				};
+				if(dagarframtid != 'none'){
+					var nuvarandedatum = nextdate(dagarframtid);
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				}else{
+					var nuvarandedatum = datum();
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				};
+				var sattdatumpritty = parseInt(sattdatum.replace(/[-]/g, ''));
+				if(nuvarandedatumpritty == sattdatumpritty){
+					return 'todayinfo';
+				}else if(nuvarandedatumpritty > sattdatumpritty){
+					return 'lateinfo';
+				}else{
+					return 'none';
+				};
+			}else if(watchtid != 'none'){
+				var nuvarandetid = tid();
+					var nuvarandetidpritty = nuvarandetid.replace(':', '');
+				var satttidpritty = sattdatum.replace(':', '');
+				if(nuvarandetidpritty >= satttidpritty){
+					return 'todayinfo';
+				}else{
+					return 'none';
+				};
+			}else{
+				console.log('comparetime() har märkt att något element har troligen watch på sig utan värde att använda = har troligen taggen av misstag');
+				return 'none';
+			};
+		};
+	</script>
+</body>
+</html>

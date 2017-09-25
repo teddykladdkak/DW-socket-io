@@ -1,0 +1,52 @@
+{
+ "data": [
+  {
+   "name": "bobby",
+   "edit": true,
+   "admin": true,
+   "losen": "123"
+  },
+  {
+   "name": "olle",
+   "edit": true,
+   "admin": false,
+   "losen": "123"
+  },
+  {
+   "name": "kajsa",
+   "edit": true,
+   "admin": false,
+   "losen": "123"
+  },
+  {
+   "name": "erik",
+   "edit": true,
+   "admin": false,
+   "losen": "123"
+  },
+  {
+   "name": "dw",
+   "edit": true,
+   "admin": false,
+   "losen": "123"
+  },
+  {
+   "name": "Åskådare",
+   "edit": false,
+   "admin": false,
+   "losen": "123"
+  },
+  {
+   "name": "test",
+   "edit": true,
+   "admin": false,
+   "losen": "123456"
+  },
+  {
+   "name": "ylva",
+   "edit": true,
+   "admin": false,
+   "losen": "123"
+  }
+ ]
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DW-Vårdplats</title>
+	<script type="application/javascript" src="filer/config.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script type="text/javascript">
+		function comparetime(sattdatum, dagarframtid){
+			var watchdatum = true;
+			var watchtid = false;
+			if(watchdatum != 'none'){
+				var samestandard = sattdatum.split('-');
+				if(samestandard[0].split('').length == 2){
+					var sattdatum = '20' + sattdatum;
+				};
+				if(dagarframtid != 'none'){
+					var nuvarandedatum = nextdate(dagarframtid);
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				}else{
+					var nuvarandedatum = datum();
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				};
+				var sattdatumpritty = parseInt(sattdatum.replace(/[-]/g, ''));
+				if(nuvarandedatumpritty == sattdatumpritty){
+					return 'todayinfo';
+				}else if(nuvarandedatumpritty > sattdatumpritty){
+					return 'lateinfo';
+				}else{
+					return 'none';
+				};
+			}else if(watchtid != 'none'){
+				var nuvarandetid = tid();
+					var nuvarandetidpritty = nuvarandetid.replace(':', '');
+				var satttidpritty = sattdatum.replace(':', '');
+				if(nuvarandetidpritty >= satttidpritty){
+					return 'todayinfo';
+				}else{
+					return 'none';
+				};
+			}else{
+				return 'none';
+			};
+		};
+		function datum(eventuelltdatum){
+			if(!eventuelltdatum){
+				var d = new Date();
+			}else{
+				var nyyear = eventuelltdatum.split('-')[0];
+				var nymonth = eventuelltdatum.split('-')[1] - 1;
+				var nyday = eventuelltdatum.split('-')[2];
+				var d = new Date(nyyear, nymonth, nyday);
+			};
+			var year = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+			if(day <= 9){var day = '0' + day;};
+			if(month <= 9){var month = '0' + month;};
+			var datetonumber = year + '-' + month + '-' + day;
+			return datetonumber;
+		};
+		function checkallbeds(){
+			for (var i = config.roomnumbers.length - 1; i >= 0; i--) {
+				checkbed(config.roomnumbers[i].replace(':', '-'));
+			};
+		};
+		function checkbed(number){
+			var checkelement = false;
+			for (var i = config.vardplats.tdelements.length - 1; i >= 0; i--) {
+				if(config.vardplats.tdelements[i].id == 'rum'){}else{
+					var wrapper = document.getElementsByName(number + config.vardplats.tdelements[i].id)[0];
+					if(wrapper.hasChildNodes()){
+						var checkelement = true;
+					};
+				};
+			};
+			var trelement = document.getElementById('rumnummer' + number);
+			if(checkelement){
+				var datewrapper = document.getElementsByName(number + '|||||utdate')[0]
+				if(datewrapper.innerText.length == 0){
+					trelement.setAttribute('class', 'belagdutanhemdat')
+				}else{
+					var checkdate = comparetime(datewrapper.innerText, 'none');
+					if(checkdate == 'none'){
+						trelement.setAttribute('class', 'belagdmedhemdat');
+					}else{
+						trelement.setAttribute('class', checkdate);
+					};
+				};
+			}else{
+				trelement.setAttribute('class', 'tom')
+			};
+		};
+		function load(){
+			var head = document.getElementsByTagName('head')[0];
+				var style = document.createElement('style');
+					style.setAttribute('type', 'text/css');
+				var forklaring = document.getElementById('forklaring');
+					for (var i = config.vardplats.colors.length - 1; i >= 0; i--) {
+						var stylecode = document.createTextNode('.' + config.vardplats.colors[i].id + '{ background-color: ' + config.vardplats.colors[i].farg + '; } ');
+						style.appendChild(stylecode);
+						var colortr = document.createElement('tr');
+							var colortd = document.createElement('td');
+								colortd.setAttribute('class', config.vardplats.colors[i].id);
+								colortd.setAttribute('style', 'width: 50px;');
+								var colortdtext = document.createTextNode('  ');
+								colortd.appendChild(colortdtext);
+							colortr.appendChild(colortd);
+							var colorbeskriv = document.createElement('td');
+								var colorbeskrivtext = document.createTextNode(config.vardplats.colors[i].rubrik);
+								colorbeskriv.appendChild(colorbeskrivtext);
+							colortr.appendChild(colorbeskriv);
+						forklaring.appendChild(colortr);
+					};
+				head.appendChild(style);
+			document.getElementById('loginname').focus();
+			config.vardplats.tdelements.reverse();
+			config.roomnumbers.reverse();
+			var tablehead = document.getElementById('tablehead');
+			for (var i = config.vardplats.tdelements.length - 1; i >= 0; i--) {
+				var tdhead = document.createElement('td');
+					var tdheadtext = document.createTextNode(config.vardplats.tdelements[i].rubrik);
+					tdhead.appendChild(tdheadtext);
+				tablehead.appendChild(tdhead);
+			};
+			var table = document.getElementById('thetable');
+			for (var i = config.roomnumbers.length - 1; i >= 0; i--) {
+				var tr = document.createElement('tr');
+					tr.setAttribute('id', 'rumnummer' + config.roomnumbers[i].replace(':', '-'));
+				for (var y = config.vardplats.tdelements.length - 1; y >= 0; y--) {
+					var td = document.createElement('td');
+						td.setAttribute('name', config.roomnumbers[i].replace(':', '-') + config.vardplats.tdelements[y].id);
+						if(config.vardplats.tdelements[y].id == 'rum'){
+							var rumtdtext = document.createTextNode(config.roomnumbers[i]);
+							td.appendChild(rumtdtext);
+						};
+					tr.appendChild(td);
+				};
+				table.appendChild(tr);
+			};
+		};
+	</script>
+	<style type="text/css">
+		body{
+			margin: 0px;
+			padding: 0px;;
+		}
+		table{
+			border-collapse: collapse;
+		}
+		table td{
+			border: 3px solid #000;
+		}
+		table thead{
+			font-weight: bold;
+		}
+		#login{
+			zoom: 2;
+			text-align: center;
+		}
+	</style>
+</head>
+<body onload="load()">
+<div id="login">
+	<input type="text" id="loginname" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="checkkey(event)"><br/><br/>
+	<input type="button" value="Logga in" onclick="login();">
+</div>
+<div id="wrapper" style="display: none;">
+<table>
+	<thead>
+		<tr id="tablehead">
+		</tr>
+	</thead>
+	<tbody id="thetable">
+	</tbody>
+</table><br/><br/>
+<table id="forklaring"></table>
+</div>
+<script type="text/javascript">
+	//Tar server id enbart för att koppla till socket
+	var geturl = window.location.href.replace('http://', '').split('/')[0];
+	//Lyssnar om server säger något
+	var socket = io.connect(geturl);
+	//Om inte användare är godkänd får den en alert...
+	socket.on('connectioninfo', function(message) {
+		showlogin();
+	});
+	//Om anslutning försvinner till server
+	socket.on('disconnect', function () {
+		showlogin();
+	});
+	//Om användare inte får redigera
+	socket.on('readonly', function(message) {
+		showlogin();
+	});
+	function showlogin() {
+		location.reload();
+	};
+	function hidelogin() {
+		document.getElementById('login').style.display = 'none';
+		document.getElementById('wrapper').style.display = 'block';
+	};
+	function login() {
+		var username = document.getElementById('loginname').value;
+		if(username.length == 0){
+			return false;
+		}else{
+			socket.emit('user', username);
+			hidelogin();
+		};
+	};
+	function checkkey(e){
+		if (event.which == 13 || event.keyCode == 13) {
+			login();
+			document.getElementById('loginname').blur();
+		};
+	};
+	//Tar mot info från server
+	socket.on('textarea', function(message) {
+		var idsplit = message.id.split('|||||');
+		for (var i = config.vardplats.tdelements.length - 1; i >= 0; i--) {
+			if(config.vardplats.tdelements[i].id == '|||||' + idsplit[1]){
+				var element = document.getElementsByName(message.id)[0];
+				while (element.hasChildNodes()) {element.removeChild(element.firstChild);};
+					var nytext = document.createTextNode(message.info);
+					element.appendChild(nytext);
+			};
+		};
+		checkallbeds();
+	});
+</script>
+</body>
+</html>

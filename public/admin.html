@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DW - Admin</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div id="login" style="display: block;">
+		<p>Användarnamn</p>
+		<input type="text" name="" id="name">
+		<p>Lösenord</p>
+		<input type="password" name="" id="pw">
+		<input type="button" value="Logga in" onclick="login();">
+	</div>
+	<div id="lista" style="display: none;">
+		
+	</div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="filer/config.js"></script>
+	<script type="text/javascript">
+		function login(){
+			var loginnamn = document.getElementById('name').value;
+			var loginpw = document.getElementById('pw').value;
+			var information = {name: loginnamn, pw: loginpw};
+			console.log(loginnamn)
+			console.log(loginpw)
+			if(loginnamn = ''){}else{
+				if(loginpw = ''){}else{
+					socket.emit('admin', information);
+				};
+			};
+		};
+		function spara(){
+			var lista = document.getElementById('lista');
+			var allusers = lista.getElementsByTagName('tr');
+			var data = [];
+			for (var i = allusers.length - 1; i >= 1; i--) {
+				var allinput = allusers[i].getElementsByTagName('input');
+				console.log(allinput)
+				if(allinput[0].value == ''){alert('Användarnamn måste vara ifyllt!');return false;};
+				if(allinput[3].value == ''){alert('Lösenord måste vara ifyllt!');return false;};
+				data.push({name: allinput[0].value, edit: allinput[1].checked, admin: allinput[2].checked, losen: allinput[3].value});
+			};
+			socket.emit('savenewusers', data.reverse());
+		};
+		//Tar bort användare
+		function removeuser(element){
+			element.parentElement.parentElement.parentElement.removeChild(element.parentElement.parentElement);
+		};
+		//Lägger till ny linje för att lägga till ny användare
+		function adduser(){
+			var table = document.getElementById('lista').firstChild;
+			table.appendChild(newline());
+		};
+		function newline(info){
+			if(!info){
+				var info = {name: '', edit: false, admin: false, losen: ''};
+			};
+			var tr = document.createElement('tr');
+				var namn = document.createElement('td');
+					var namninput = document.createElement('input');
+						namninput.setAttribute('type', 'text');
+						namninput.setAttribute('value', info.name)
+					namn.appendChild(namninput);
+				tr.appendChild(namn);
+				var edit = document.createElement('td');
+					var editinput = document.createElement('input');
+						editinput.setAttribute('type', 'checkbox');
+						if(info.edit == true){
+							editinput.setAttribute('checked', 'true');
+						};
+					edit.appendChild(editinput);
+				tr.appendChild(edit);
+				var admin = document.createElement('td');
+					var admininput = document.createElement('input');
+						admininput.setAttribute('type', 'checkbox');
+						if(info.admin == true){
+							admininput.setAttribute('checked', 'true');
+						};
+					admin.appendChild(admininput);
+				tr.appendChild(admin);
+				var losen = document.createElement('td');
+					var loseninput = document.createElement('input');
+						loseninput.setAttribute('type', 'text');
+						loseninput.setAttribute('value', info.losen)
+					losen.appendChild(loseninput);
+				tr.appendChild(losen);
+				var tabort = document.createElement('td');
+					var removebutton = document.createElement('input');
+						removebutton.setAttribute('type', 'button');
+						removebutton.setAttribute('value', ' - ');
+						removebutton.setAttribute('onclick', 'removeuser(this);');
+					tabort.appendChild(removebutton);
+				tr.appendChild(tabort);
+			return tr;
+		}
+		//Tar server id enbart för att koppla till socket
+		var geturl = window.location.href.replace('http://', '').split('/')[0];
+		//Lyssnar om server säger något
+		var socket = io.connect(geturl);
+		socket.on('adminsparad', function(message) {
+			var wrapper = document.getElementById('sparadinfo');
+				wrapper.setAttribute('style', 'display: inline-block;');
+				setTimeout(function(){ wrapper.setAttribute('style', 'display: none;'); }, 3000);
+		});
+		//Om lösenord stämmer läggs användarna in i en lista
+		socket.on('admintrue', function(message) {
+			message.reverse();
+			var wrapper = document.getElementById('lista');
+			while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+				var table = document.createElement('table');
+					var head = document.createElement('tr');
+						var headelements = ['Namn', 'Edit', 'Admin', 'Lösenord', 'Ta bort'].reverse();
+						for (var i = headelements.length - 1; i >= 0; i--) {
+							var headtd = document.createElement('td');
+								var headtdtext = document.createTextNode(headelements[i]);
+								headtd.appendChild(headtdtext);
+							head.appendChild(headtd);	
+						};
+					table.appendChild(head);
+					for (var i = message.length - 1; i >= 0; i--) {
+						table.appendChild(newline(message[i]));
+					};
+				wrapper.appendChild(table);
+				var addbutton = document.createElement('input');
+					addbutton.setAttribute('type', 'button');
+					addbutton.setAttribute('value', ' + ');
+					addbutton.setAttribute('onclick', 'adduser();');
+				wrapper.appendChild(addbutton);
+				var sparabutton = document.createElement('input');
+					sparabutton.setAttribute('type', 'button');
+					sparabutton.setAttribute('value', 'spara');
+					sparabutton.setAttribute('onclick', 'spara();');
+				wrapper.appendChild(sparabutton);
+				var sparainfo = document.createElement('span');
+					sparainfo.setAttribute('id', 'sparadinfo');
+					sparainfo.setAttribute('style', 'display: none;');
+					var sparainfotext = document.createTextNode('(Information sparad!)');
+					sparainfo.appendChild(sparainfotext);
+				wrapper.appendChild(sparainfo);
+				wrapper.setAttribute('style', 'display: block;');
+			var login = document.getElementById('login');
+				login.setAttribute('style', 'display: none;');
+		});
+	</script>
+</body>
+</html>

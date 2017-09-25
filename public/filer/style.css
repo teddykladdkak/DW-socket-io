@@ -1,0 +1,464 @@
+body {
+	margin: 0px;
+	padding: 0px;
+}
+#contentwrapper .empty, #contentwrapper ::-webkit-input-placeholder {
+    color: lightgray;
+}
+::-webkit-scrollbar {
+    width: 5px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+body, p, td, input, textarea{
+	font-family: verdana;
+	font-size: 12px;
+}
+textarea, #contentwrapper table{
+	height:100%;
+}
+.nutritiontextarea{
+	height:75%;
+}
+.vpl textarea{
+	height:40px;	
+}
+input, textarea, select {
+	border-style: solid;
+	border-width: 3px;
+	border-color: #FFF;
+}
+#contentwrapper td.color{
+	width:20px;
+	color:#FFF;
+	padding:5px;
+}
+#contentwrapper input, #contentwrapper textarea, #contentwrapper select{
+	width:100%;
+}
+#contentwrapper table.vpl, #contentwrapper table.vpl tr, #contentwrapper table.vpl td{
+	border-style: solid;
+	border-width: 0px!important;
+	border-collapse: collapse;
+	width:100%;
+}
+input:hover, textarea:hover, select:hover {
+	border-style: solid;
+	border-width: 3px;
+	border-color: #999;
+}
+input:focus, textarea:focus, select:focus {
+	border-color: #000;	
+}
+#contentwrapper table, #contentwrapper td{
+	border-style: solid;
+	border-width: 3px;
+	border-color: #000;
+	border-collapse: collapse;
+}
+#contentwrapper table tr td:nth-child(4), #contentwrapper table tr td:nth-child(5), #contentwrapper table tr td:nth-child(6), #contentwrapper table tr td:nth-child(8){
+	width:25%;
+}
+.obsicon {
+	min-width: 118px;
+}
+ul{
+	padding-left:20px;
+}
+.vplimg{
+	text-align:right;
+}
+.kostselect{
+	width:100px!important;
+}
+.annaticon{
+	width:59px;
+	height:59px;
+	vertical-align: top;
+	margin-top: 5px;
+}
+.tooltip {
+	position: relative;
+	display: inline-block;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;  
+}
+.tooltip .tooltiptext {
+	visibility: hidden;
+	width: 120px;
+	background-color: black;
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px 0;
+	position: absolute;
+	top:20px;
+	left:20px;
+	z-index: 1;
+}
+.icotext p{
+	text-transform: uppercase;
+	background-color: #F00;
+	color:#FFF;
+	font-weight: bold;
+	text-align: center;
+	margin: 2px;
+	padding: 5px;
+	display:inline-block;
+}
+#iconmenu{
+	padding-bottom:0px;
+	text-align: center;
+	position: fixed;
+	left:0px;
+	bottom:50%;
+	width:100%;
+	border-style: solid;
+	border-width: 5px 0px;
+	background-color: lightgray;
+}
+.genderimage, #iconmenu .notactive {
+	opacity: 0.2;
+}
+#contentwrapper table td .notactive, .vardplandate{
+	display: none;
+}
+#contentwrapper{
+	height:100%;
+}
+#contentwrapper td, #contentwrapper tr{
+	padding:0px;
+	margin:0px;
+}
+p{
+	margin-bottom: 2px;
+	margin-top: 0px;
+}
+#deselect{
+	position:absolute;
+	top:-999px;
+	left:-999px;
+}
+#contentwrapper thead, .roomnumber{
+	font-weight: bold;
+}
+p.lateinfo, p.todayinfo{
+	font-weight: bold;
+}
+.todolist li, .icotext p{
+	cursor: pointer;
+}
+.roomnumber, thead, .obsicon, .todolist, .paste, .page td:nth-child(1), .page h3{
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	cursor:default;
+}
+.menyfast{
+	width:100%;
+	position: absolute;
+}
+.menytopright{
+	position: absolute;
+}
+.menyfast, .menytopright{
+	right:0px;
+	padding: 10px;
+	max-width: 500px;
+	display: none;
+	border-style: solid;
+	border-width: 0px 0px 5px 5px;
+	background-color: lightgray;
+}
+.menyfast input, .menytopright textarea, .menytopright input, .menytopright select{
+	zoom:1.8;
+	margin:5px;
+}
+#iconmenu input, #iconmenu select {
+	zoom:1.8;
+	margin:5px;
+}
+.menyfast p{
+	margin-top: 5px;
+}
+.menyfast h3{
+	margin-bottom: 2px;
+}
+.menytopright input[type=button], .menytopright textarea{
+	width:90%;
+}
+.spacer{
+	background-color: #000;
+}
+span.watch{
+	white-space: nowrap;
+	margin-bottom: 5px;
+}
+#installninguppgifter span,  #installningkontroller span, .installningunderbutton{
+	white-space: nowrap;
+	display: block;
+	margin-bottom: 5px;
+	width:90%;
+}
+#installninguppgifter input[type=button],  #installningkontroller input[type=button]{width:10%;}
+#installninguppgifter input[type=text],  #installningkontroller input[type=text]{width:70%;}
+.installningunderelement{
+	width:100%;
+	display:none;
+}
+#passwordload input[type=button], #password input[type=button]{
+	width:40%;
+}
+h4{
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+#historikwrapper{
+	word-wrap: normal;
+	width: 240px;
+	height:400px;
+	overflow-y: auto;
+}
+#historikwrapper p{
+	padding-bottom: 5px;
+}
+#attgoracontainer, #patblad, #patblad .page, #minisbarcontainer{
+	display: none;
+}
+#patblad table{
+	border-collapse: collapse;
+}
+#patblad td{
+	border-collapse: collapse;
+	vertical-align: top;
+}
+#patblad table{
+	width:100%;
+	height:100%;
+	background-color: #FFF;
+	margin:0px;
+	padding:0px;
+}
+#patblad p{
+	padding-bottom: 1px;
+	margin-bottom: 1px;
+	margin-top: 0px;
+	padding-top: 0px;
+}
+#patblad h3, #patblad .patbladextrainfo{
+	text-align: center;
+	margin-top: 0px;
+	font-size: 20px;
+}
+#patblad{
+	width: 100%;
+	height: 18.4cm;
+}
+#patblad ul, #patblad li{
+	margin-top:0px;
+	margin-bottom:0px;
+	padding-top:0px;
+	padding-bottom:0px;
+}
+#patblad .page{
+	width:49%;
+	height: 100%;
+	margin-bottom: 0.5cm;
+	page-break-before: always;
+}
+#patblad .page .datumsbar, #attgoracontainer .datumsbar, #minisbarcontainer .datumsbar {
+	font-size: 10px!important;
+	color: lightgray;
+}
+#patblad .patbladborder{
+	border-bottom: 3px solid #999;
+}
+#patblad .patbladinfoline{
+	height:25%;
+}
+#patblad .patbladhead{
+	font-size: 20px;
+	text-align: right;
+}
+#patblad .patbladmark {
+	color: #999;
+}
+#patblad .patbladmark:before {
+	content: "☐"; /*9744*/
+}
+#patblad .patbladmarkactive {
+	color: #000;
+	font-weight: bold;
+}
+#patblad .patbladmarkactive:before {
+	content: "☒"; /*9746*/
+}
+.patbladnollhlr:before {
+	content: "⚪"; /*9746*/
+}
+.patbladnollhlractive:before {
+	content: "⊗"; /*9746*/
+}
+.sbarsvalt{
+	text-decoration: line-through;
+}
+.edit {
+	background-color: lightgray;
+	padding-right:10px;
+	display: inline-block;
+}
+.edit pre{
+	white-space: pre-wrap;
+	background: #EEE;
+}
+#nutritioncontainer{
+	display: none;
+}
+@media print {
+	#moreinfobottom, #moreinfotop, .menyfast, .menytopright, #iconmenu, #contentwrapper, #patblad input {
+		display: none!important;
+	}
+	#sbar .edit{
+		background-color: #FFF;
+	}
+	body#sbar, #sbar #patblad table {
+		margin:0px;
+		padding:0px;
+		box-shadow: 0;
+	}
+	body#sbar, #sbar p, #sbar td, #sbar input, #sbar textarea{
+		font-size: 12px!important;
+	}
+	#sbar #patblad .page{
+		width:49%;
+		height: 100%;
+		display:inline-table;
+		margin-bottom: 0.5cm;
+	}
+	#sbar #patblad .page:nth-child(2n){
+		float: right;
+	}
+	#sbar #patblad{
+		display: inline-block;
+	}
+	#attgora #attgoracontainer{
+		display: block;
+	}
+	#nutrition #nutritioncontainer{
+		display: block;
+	}
+	#sbarmin #minisbarcontainer {
+		display: block;
+	}
+	#sbarmin #minisbarcontainer table tr td h3, #sbarmin #minisbarcontainer table tr td p {
+		font-size: 14px!important;
+		margin: 0px;
+		padding: 0px;
+	}
+	#sbarmin #minisbarcontainer table tr td p {
+		margin-bottom: 20px;
+	}
+	#sbarmin #minisbarcontainer table, #attgora #attgoracontainer table{
+		width:100%;
+		border-collapse: collapse;
+	}
+	#attgora #attgoracontainer table td{
+		min-height: 500px;
+		vertical-align: top;
+	}
+	#attgora #attgoracontainer table td li{
+		list-style-type: circle;
+	}
+	#attgora #attgoracontainer table td h3{
+		border-top: 3px solid #000;
+	}
+	/*#sbarmin #minisbarcontainer table tr {
+		font-weight: bold;
+	}
+	#sbarmin #minisbarcontainer table tr:nth-child(2n) {
+		border-bottom: 1px solid #000;
+		min-height: 80px;
+		height: 80px;
+		vertical-align: top;
+		font-weight: normal;
+	}*/
+	#sbarmin #minisbarcontainer table tr, #sbarmin #minisbarcontainer table tr td {
+		border-bottom: 1px solid #000;
+		min-height: 80px;
+		height: 80px;
+		vertical-align: top;
+		page-break-inside: avoid;
+	}
+}
+#iconmenu, .menytopright, .menyfast{-webkit-animation:opac 0.2s;animation:opac 0.2s}
+@-webkit-keyframes opac{from{opacity:0} to{opacity:1}}
+@keyframes opac{from{opacity:0} to{opacity:1}}
+#alert {
+	text-align: center;
+	position: fixed;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	background-color: red;
+	color: #FFF;
+	font-weight: bold;
+	zoom: 2;
+	padding: 20px;
+	z-index: 1;
+}
+#alert input {
+	margin: 10px;
+}
+#alert p{
+	width: 70%;
+	display: inline-block;
+}
+#moreinfotop, #moreinfobottom {
+	display: none;
+	position: fixed;
+	left: 0px;
+	width: 100%;
+	z-index: 1;
+}
+#moreinfotop {
+	top: 0px;
+}
+#moreinfobottom {
+	bottom: 0px;
+}
+.medprio{
+	/*background: #FF0000;
+	background: -moz-linear-gradient(-45deg, #FF0000 0%, #FF0000 20%, #ffffff 21%, #ffffff 100%);
+	background: -webkit-linear-gradient(-45deg, #FF0000 0%,#FF0000 20%,#ffffff 21%,#ffffff 100%);
+	background: linear-gradient(135deg, #FF0000 0%,#FF0000 20%,#ffffff 21%,#ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FF0000', endColorstr='#ffffff',GradientType=1 );*/
+	background-color: #FF0000;
+	color:#FFF;
+}
+.medplan{
+	background: #0000FF;
+	background: -moz-linear-gradient(-45deg, #0000FF 0%, #0000FF 20%, #ffffff 21%, #ffffff 100%);
+	background: -webkit-linear-gradient(-45deg, #0000FF 0%,#0000FF 20%,#ffffff 21%,#ffffff 100%);
+	background: linear-gradient(135deg, #0000FF 0%,#0000FF 20%,#ffffff 21%,#ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0000FF', endColorstr='#ffffff',GradientType=1 );
+}
+.medklar{
+	background: #00FF00;
+	background: -moz-linear-gradient(-45deg, #00FF00 0%, #00FF00 20%, #ffffff 21%, #ffffff 100%);
+	background: -webkit-linear-gradient(-45deg, #00FF00 0%,#00FF00 20%,#ffffff 21%,#ffffff 100%);
+	background: linear-gradient(135deg, #00FF00 0%,#00FF00 20%,#ffffff 21%,#ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00FF00', endColorstr='#ffffff',GradientType=1 );	
+}

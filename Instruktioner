@@ -1,0 +1,8 @@
+Vid installation kör:
+	Installera nodejs på datorn
+	npm install
+	npm install socket.io
+
+
+Kommando för att starta webbserver:
+	node app.js

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="/socket.io/socket.io.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<meta content="yes" name="mobile-web-app-capable" />
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="shortcut icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/vnd.microsoft.icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/png" href="filer/icons/icon196x196.png" />
+	<link rel="apple-touch-icon-precomposed" href="filer/icons/icon180x180.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="filer/icons/icon76x76.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="filer/icons/icon120x120.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="filer/icons/icon152x152.png.png">
+	<title>Digital Whiteboard App</title>
+	<script type="application/javascript" src="filer/config.js"></script>
+	<script type="application/javascript" src="filer/main.js"></script>
+	<script type="text/javascript">
+		function apptogglemeny(){
+			var menyelement = document.getElementById('menywrapper');
+			if(!menyelement.getAttribute('style')){
+				menyelement.style.display = 'none';
+			}else{
+				menyelement.style.display = '';
+			};
+		};
+		String.prototype.capitalizeFirstLetter = function() {return this.charAt(0).toUpperCase() + this.slice(1);};
+		function appdoljpatient(element, number){
+			if(element.checked){
+				document.getElementById(number.replace(':', '-')).style.display = '';
+				element.parentElement.style.color = '';
+			}else{
+				document.getElementById(number.replace(':', '-')).style.display = 'none';
+				element.parentElement.style.color = 'gray';
+			};
+		};
+		function appandrafargpatient(element, number){
+			if(!element.value){
+				document.getElementById(number.replace(':', '-')).style.background = '';
+				element.parentElement.style.background = '';
+			}else{
+				document.getElementById(number.replace(':', '-')).style.background = element.value;
+				element.parentElement.style.background = element.value
+			};
+		};
+		function appflyttapatient(number, element){
+			var numberto = element.parentElement.getElementsByTagName('select')[0].value;
+			var elementstomove = ['patientdata', 'obsicons', 'opinfo', 'bakgrund', 'nutrition', 'adl', 'aktuellt', 'uppgifter', 'kontroller', 'planhem', 'anteckningar'];
+			var patienttablefrom = document.getElementById(number.replace(':', '-'));
+			var patienttableto = document.getElementById(numberto.replace(':', '-'));
+			for (var i = elementstomove.length - 1; i >= 0; i--) {
+				var oldParent = patienttablefrom.getElementsByClassName(elementstomove[i])[0];
+				var newParent = patienttableto.getElementsByClassName(elementstomove[i])[0];
+				while (oldParent.firstChild) newParent.appendChild(oldParent.firstChild);
+			};
+			var listfrom = document.getElementsByName('list|||||' + number.replace(':', '-'))[0];
+			var listto = document.getElementsByName('list|||||' + numberto.replace(':', '-'))[0];
+			listto.getElementsByClassName('listname')[0].appendChild(listfrom.getElementsByClassName('listname')[0].firstChild);
+			for (var i = listfrom.getElementsByClassName('default').length - 1; i >= 0; i--) {
+				listfrom.getElementsByClassName('default')[i].setAttribute('disabled', 'true');
+			};
+			for (var i = listto.getElementsByClassName('default').length - 1; i >= 0; i--) {
+				listto.getElementsByClassName('default')[i].removeAttribute('disabled');
+			};
+			apphideaddmeny();
+		};
+		function apptabortpatient(element, number){
+			var patienttable = document.getElementById(number.replace(':', '-'));
+			element.parentElement.getElementsByClassName('listname')[0].innerText = '';
+			var alldefault = element.parentElement.getElementsByClassName('default');
+			for(i=0;i<alldefault.length;i++){
+				alldefault[i].setAttribute('disabled', 'true');
+			};
+			var elementstodelete = ['patientdata', 'obsicons', 'opinfo', 'bakgrund', 'nutrition', 'adl', 'aktuellt', 'uppgifter', 'kontroller', 'planhem', 'anteckningar'];
+			for (var i = elementstodelete.length - 1; i >= 0; i--) {
+				patienttable.getElementsByClassName(elementstodelete[i])[0].innerText = '';
+			}
+		};
+		function appredigerapatient(number){//appredigerapatient('1-2')
+			var wrapper = document.getElementById(number.replace(':', '-'));
+			document.getElementById('laggtillnummer').value = number.replace(':', '-');
+			var patientdata = wrapper.getElementsByClassName('patientdata')[0].innerText.split(' ');
+			document.getElementsByName('initialer')[0].value = patientdata[1];
+			document.getElementsByName('alder')[0].value = patientdata[2].replace('-', '');
+			document.getElementsByName('kon')[0].value = patientdata[3].charCodeAt(0);
+			var icons = wrapper.getElementsByClassName('obsicons')[0].getElementsByTagName('img');
+			for(i=0;i<icons.length;i++){
+				var id = icons[i].getAttribute('data-namn');
+				var alllaggtillicons = document.getElementById('laggtillicons').getElementsByTagName('img');
+				for(a=0;a<alllaggtillicons.length;a++){
+					if(id == alllaggtillicons[a].getAttribute('data-namn')){
+						alllaggtillicons[a].removeAttribute('class');
+					};
+				};
+			};
+			var alotofelements = ['opdatum', 'optyp', 'bakgrundinfo', 'kost', 'kostinfo', 'adlinfo', 'adlhjalpmedel', 'utdatum', 'uttransport'];
+			for(i=0;i<alotofelements.length;i++){
+				document.getElementsByName(alotofelements[i])[0].value = wrapper.getElementsByClassName(alotofelements[i])[0].innerText;
+			};
+			var allelementseditable = ['aktuellt', 'anteckningar'];
+			for(i=0;i<allelementseditable.length;i++){
+				document.getElementsByName(allelementseditable[i])[0].value = wrapper.getElementsByClassName(allelementseditable[i])[0].getElementsByClassName('editabel')[0].innerText;
+			};
+			document.getElementsByName('planhemanteck')[0].value = wrapper.getElementsByClassName('planhem')[0].getElementsByClassName('editabel')[0].innerText;
+			var uppgiftellerkontroll = ['uppgifter', 'kontroller'];
+			for(i=0;i<uppgiftellerkontroll.length;i++){
+				var informaiton = wrapper.getElementsByClassName(uppgiftellerkontroll[i])[0].getElementsByTagName('li');
+				for(a=0;a<informaiton.length;a++){
+					var inputwrapper = document.getElementsByClassName(uppgiftellerkontroll[i] + 'element');
+					if(a == 0){
+						inputwrapper[0].getElementsByTagName('input')[0].value = informaiton[a].innerText;
+					}else{
+						applaggtilladdline(inputwrapper[0].getElementsByTagName('input')[0]);
+						inputwrapper[inputwrapper.length -1].getElementsByTagName('input')[0].value = informaiton[a].innerText;
+					};
+				};
+			};
+			appchangeview('laggtill');
+		};
+		function applaggtilladdline(element){var wholespan = element.parentElement.cloneNode(true);element.parentElement.parentElement.appendChild(wholespan);};
+		function applaggtillremoveline(element){if(element.parentElement.parentElement.getElementsByTagName('div').length == 1){element.parentElement.getElementsByTagName('input')[0].value = '';}else{element.parentElement.parentElement.removeChild(element.parentElement);};};
+		function applaggtillrensa(){
+			var wrapper = document.getElementById('laggtill');
+			var elementstoadd = ['input', 'select', 'textarea'];
+			for(a=0;a<elementstoadd.length;a++){
+				var elements = wrapper.getElementsByTagName(elementstoadd[a]);
+				for(i=0;i<elements.length;i++){
+					if(elements[i].getAttribute('type') == 'button'){}else{
+						if(elementstoadd[a] == 'select'){
+							elements[i].selectedIndex = 0;
+						}else{
+							elements[i].value = '';
+						};
+					};
+				};
+			};
+			var allimage = document.getElementById('laggtillicons').getElementsByTagName('img');
+			for(i=0;i<allimage.length;i++){
+				allimage[i].setAttribute('class', 'imgdeactive');
+			};
+			var uppgiftkontrollelement = ['uppgifterelement', 'kontrollerelement'];
+			for(a=0;a<uppgiftkontrollelement.length;a++){
+				var allkontrollelement = wrapper.getElementsByClassName(uppgiftkontrollelement[a]);
+				for(i=0;i<allkontrollelement.length -1;i++){
+					allkontrollelement[i].parentElement.removeChild(allkontrollelement[i]); 
+				};
+			};
+		};
+		function applaggtillpat(){
+			var wrapper = document.getElementById('laggtill');
+			var obj = {};
+			var elementstoadd = ['input', 'select', 'textarea'];
+			for(a=0;a<elementstoadd.length;a++){
+				var elements = wrapper.getElementsByTagName(elementstoadd[a]);
+				for(i=0;i<elements.length;i++){
+					if(elements[i].getAttribute('type') != 'button' || elements[i].getAttribute('name') != 'uppgifter' || elements[i].getAttribute('name') != 'kontroller'){
+						var id = elements[i].getAttribute('name');
+						var val = elements[i].value;
+						obj[id] = val;
+					};
+				};
+			};
+			var valdaikoner = [];
+			var allaikoner = document.getElementById('laggtillicons').getElementsByTagName('img');
+			for(i=0;i<allaikoner.length;i++){
+				if(allaikoner[i].getAttribute('class') != 'imgdeactive'){
+					valdaikoner.push(allaikoner[i].getAttribute('data-namn'));
+				};
+			};
+			var laggtilluppgiftellerkontroll = [{namn: 'uppgifter',elements: []},{namn: 'kontroller',elements: []}];
+			for(a=0;a<laggtilluppgiftellerkontroll.length;a++){
+				var uppgifterelements = document.getElementsByName(laggtilluppgiftellerkontroll[a].namn);
+				for(i=0;i<uppgifterelements.length;i++){
+					laggtilluppgiftellerkontroll[a].elements.push(uppgifterelements[i].value)
+				};
+			};
+			apppasteinfo(obj.number, obj.initialer, obj.alder, obj.kon, valdaikoner, obj.opdatum, obj.optyp, obj.bakgrundinfo, obj.kost, obj.kostinfo, obj.adlinfo, obj.adlhjalpmedel, obj.aktuellt, laggtilluppgiftellerkontroll, obj.utdatum, obj.planhemanteck, obj.uttransport, obj.anteckningar);
+			applaggtillrensa();
+			appchangeview('content');
+		};
+		function applaggtillicon(element){
+			if(element.getAttribute('class') == 'imgdeactive'){
+				element.removeAttribute('class')
+			}else{
+				element.setAttribute('class', 'imgdeactive');
+			};
+		};
+		function appaddlaggtillelements(){
+			var laggtillplats = document.getElementById('laggtillnummer');
+			for(i=0;i<config.roomnumbers.length;i++){
+				var option = document.createElement('option');
+					option.setAttribute('value', config.roomnumbers[i].replace(':', '-'));
+					var optiontext = document.createTextNode(config.roomnumbers[i].replace('-', ':'));
+					option.appendChild(optiontext);
+				laggtillplats.appendChild(option);
+			};
+			var laggtilluttransport = document.getElementById('laggtilluttransport');
+				var option = document.createElement('option');
+					option.setAttribute('value', '');
+					var optiontext = document.createTextNode('');
+					option.appendChild(optiontext);
+				laggtilluttransport.appendChild(option);
+			for(i=0;i<config.hemtransport.length;i++){
+				var option = document.createElement('option');
+					option.setAttribute('value', config.hemtransport[i]);
+					var optiontext = document.createTextNode(config.hemtransport[i]);
+					option.appendChild(optiontext);
+				laggtilluttransport.appendChild(option);
+			};
+			var laggtillicons = document.getElementById('laggtillicons');
+			for(i=0;i<config.icotodo.length - 1;i++){
+				var laggtillimg = document.createElement('img');
+					laggtillimg.setAttribute('src', config.icolink[0] + config.icotodo[i].namn + config.icolink[1]);
+					laggtillimg.setAttribute('title', config.icotodo[i].title);
+					laggtillimg.setAttribute('class', 'imgdeactive');
+					laggtillimg.setAttribute('data-namn', config.icotodo[i].namn);
+					laggtillimg.setAttribute('onclick', 'applaggtillicon(this);');
+				laggtillicons.appendChild(laggtillimg);
+			};
+		};
+		function apponload(){
+
+			build();
+		};
+		function build(){
+			appaddlaggtillelements();
+			var contentwrapper = document.getElementById('content');
+			for(i=0;i<config.roomnumbers.length;i++){
+				var listwrapper = document.getElementById('list');
+					var nylistelement = document.createElement('div');
+						nylistelement.setAttribute('class', 'patientlist');
+						nylistelement.setAttribute('name', 'list|||||' + config.roomnumbers[i].replace(':', '-'));
+						var listdoljinput = document.createElement('input');
+							listdoljinput.setAttribute('type', 'checkbox');
+							listdoljinput.setAttribute('checked', 'true');
+							listdoljinput.setAttribute('onchange', 'appdoljpatient(this, "' + config.roomnumbers[i].replace(':', '-') + '")');
+						nylistelement.appendChild(listdoljinput);
+						var nylistelementtext = document.createTextNode(config.roomnumbers[i].replace('-', ':') + ' ');
+						nylistelement.appendChild(nylistelementtext);
+						var namespan = document.createElement('span');
+							namespan.setAttribute('class', 'listname');
+						nylistelement.appendChild(namespan);
+						var listredigerainput = document.createElement('input');
+							listredigerainput.setAttribute('type', 'button');
+							listredigerainput.setAttribute('value', 'Redigera');
+							listredigerainput.setAttribute('disabled', 'true');
+							listredigerainput.setAttribute('class', 'default');
+							listredigerainput.setAttribute('onclick', 'appredigerapatient("' + config.roomnumbers[i].replace(':', '-') + '")');
+						nylistelement.appendChild(listredigerainput);
+						var listfarginput = document.createElement('input');
+							listfarginput.setAttribute('type', 'color');
+							listfarginput.setAttribute('value', '#FFFFFF');
+							listfarginput.setAttribute('onchange', 'appandrafargpatient(this, "' + config.roomnumbers[i].replace(':', '-') + '")');
+						nylistelement.appendChild(listfarginput);
+						var listflyttainput = document.createElement('input');
+							listflyttainput.setAttribute('type', 'button');
+							listflyttainput.setAttribute('value', 'Flytta');
+							listflyttainput.setAttribute('onclick', 'appmenyadd("' + config.roomnumbers[i].replace(':', '-') + '", "", "flytt", "");');
+							listflyttainput.setAttribute('disabled', 'true');
+							listflyttainput.setAttribute('class', 'default');
+						nylistelement.appendChild(listflyttainput);
+						var listremoveinput = document.createElement('input');
+							listremoveinput.setAttribute('type', 'button');
+							listremoveinput.setAttribute('value', 'Ta bort');
+							listremoveinput.setAttribute('onclick', 'apptabortpatient(this, "' + config.roomnumbers[i].replace(':', '-') + '")');
+							listremoveinput.setAttribute('disabled', 'true');
+							listremoveinput.setAttribute('class', 'default');
+						nylistelement.appendChild(listremoveinput);
+					listwrapper.appendChild(nylistelement);
+				var wrapper = document.createElement('div');
+					wrapper.setAttribute('id', config.roomnumbers[i].replace(':', '-'));
+					wrapper.setAttribute('class', 'patienttable');
+					var head = document.createElement('div');
+						head.setAttribute('class', 'head');
+						var headh2 = document.createElement('h2');
+							var headh2text = document.createTextNode(config.roomnumbers[i].replace('-', ':'));
+							headh2.appendChild(headh2text);
+							var headh2span = document.createElement('span');
+								headh2span.setAttribute('class', 'patientdata');
+								var headh2spanname = document.createElement('span');
+									headh2spanname.setAttribute('class', 'namn');
+								headh2span.appendChild(headh2spanname);
+								var headh2spanalder = document.createElement('span');
+									headh2spanalder.setAttribute('class', 'alder');
+								headh2span.appendChild(headh2spanalder);
+								var headh2spankon = document.createElement('span');
+									headh2spankon.setAttribute('class', 'kon');
+								headh2span.appendChild(headh2spankon);
+							headh2.appendChild(headh2span);
+						head.appendChild(headh2);
+						var obsicons = document.createElement('span');
+							obsicons.setAttribute('class', 'obsicons');
+						head.appendChild(obsicons);
+					wrapper.appendChild(head);
+					var opinfo = document.createElement('div');
+						opinfo.setAttribute('class', 'opinfo');
+					wrapper.appendChild(opinfo);
+					var bakgrund = document.createElement('div');
+						bakgrund.setAttribute('class', 'bakgrund');
+					wrapper.appendChild(bakgrund);
+					var nutrition = document.createElement('div');
+						nutrition.setAttribute('class', 'nutrition');
+					wrapper.appendChild(nutrition);
+					var adl = document.createElement('div');
+						adl.setAttribute('class', 'adl');
+					wrapper.appendChild(adl);
+					var aktuellt = document.createElement('div');
+						aktuellt.setAttribute('class', 'aktuellt');
+					wrapper.appendChild(aktuellt);
+					var uppgifter = document.createElement('div');
+						uppgifter.setAttribute('class', 'uppgifter');
+					wrapper.appendChild(uppgifter);
+					var kontroller = document.createElement('div');
+						kontroller.setAttribute('class', 'kontroller');
+					wrapper.appendChild(kontroller);
+					var planhem = document.createElement('div');
+						planhem.setAttribute('class', 'planhem');
+					wrapper.appendChild(planhem);
+					var anteckningar = document.createElement('div');
+						anteckningar.setAttribute('class', 'anteckningar');
+					wrapper.appendChild(anteckningar);
+				contentwrapper.appendChild(wrapper);
+			};
+			loadallsession();
+		};
+		function appmenyadd(nummer, element, typ, configid){
+			var menywrapper = document.getElementById('addmeny');
+				menywrapper.setAttribute('style', 'display: block;');
+			while (menywrapper.hasChildNodes()) {menywrapper.removeChild(menywrapper.firstChild);};
+			if(typ == 'date'){
+				var elementtopaste = document.createElement('input');
+					elementtopaste.setAttribute('type', 'date');
+				menywrapper.appendChild(elementtopaste);
+			}else if(typ == 'select'){
+				var objekt = window['config'][configid];
+				var select = document.createElement('select');
+					var firstoption = document.createElement('option');
+						var firstoptiontext = document.createTextNode('');
+						firstoption.appendChild(firstoptiontext);
+					select.appendChild(firstoption);
+				for(i=0;i<objekt.length;i++){
+					var option = document.createElement('option');
+						var optiontext = document.createTextNode(objekt[i]);
+						option.appendChild(optiontext);
+					select.appendChild(option);
+				};
+				menywrapper.appendChild(select);
+			}else if(typ == 'text'){
+				var elementtopaste = document.createElement('input');
+					elementtopaste.setAttribute('type', 'text');
+					elementtopaste.setAttribute('value', element.innerText);
+				menywrapper.appendChild(elementtopaste);
+				if(!configid){}else{
+					elementtopaste.setAttribute('list', 'extrainfo');
+					var objekt = window['config'][configid];
+					var datalistelement = document.createElement('datalist');
+						datalistelement.setAttribute('id', 'extrainfo');
+					for(i=0;i<objekt.length;i++){
+						var datalistelementoption = document.createElement('option');
+							datalistelementoption.setAttribute('value', objekt[i]);
+						datalistelement.appendChild(datalistelementoption);
+					};
+					menywrapper.appendChild(datalistelement);
+				};
+			}else if(typ == 'button'){
+				var objekt = window['config'][configid];
+				for(i=0;i<objekt.length;i++){
+					var elementtopaste = document.createElement('input');
+						elementtopaste.setAttribute('type', 'button');
+						elementtopaste.setAttribute('value', objekt[i].namn);
+						elementtopaste.setAttribute('onclick', 'appgetmoreinfo("' + nummer.replace(':', '-') + '", "' + configid + '", "' + objekt[i].namn + '")');
+					menywrapper.appendChild(elementtopaste);
+				};
+				var annatbutton = document.createElement('input');
+					annatbutton.setAttribute('type', 'button');
+					annatbutton.setAttribute('value', 'Annat..');
+					annatbutton.setAttribute('onclick', 'appgetmoreinfo("' + nummer.replace(':', '-') + '", "' + configid + '", "annat")');
+				menywrapper.appendChild(annatbutton);
+				var extrabuttons = true;
+			}else if(typ == 'flytt'){
+				var sangar = config.roomnumbers;
+				var select = document.createElement('select');
+				for(i=0;i<sangar.length;i++){
+					var option = document.createElement('option');
+						var optiontext = document.createTextNode(sangar[i]);
+						option.appendChild(optiontext);
+					select.appendChild(option);
+				};
+				menywrapper.appendChild(select);
+				var okbutton = document.createElement('input');
+					okbutton.setAttribute('type', 'button');
+					okbutton.setAttribute('value', 'Ok');
+					okbutton.setAttribute('onclick', 'appflyttapatient("' + nummer.replace(':', '-') + '", this);');
+				menywrapper.appendChild(okbutton);
+				var avbrytbutton = document.createElement('input');
+					avbrytbutton.setAttribute('type', 'button');
+					avbrytbutton.setAttribute('value', 'Avbryt');
+					avbrytbutton.setAttribute('onclick', 'apphideaddmeny();');
+				menywrapper.appendChild(avbrytbutton);
+				var extrabuttons = true;
+			};
+			if(!extrabuttons){
+				var rensabutton = document.createElement('input');
+					rensabutton.setAttribute('type', 'button');
+					rensabutton.setAttribute('value', 'X');
+					rensabutton.setAttribute('onclick', 'appremoveinformation(this);');
+				menywrapper.appendChild(rensabutton);
+				var okbutton = document.createElement('input');
+					okbutton.setAttribute('type', 'button');
+					okbutton.setAttribute('value', 'Ok');
+					okbutton.setAttribute('onclick', 'appaddinformation("' + nummer.replace(':', '-') + '", "' + element.getAttribute('class') + '", "' + typ + '");');
+				menywrapper.appendChild(okbutton);
+			};
+			var firstpattable = document.getElementsByClassName('patienttable');
+			setTimeout(function(){
+				for(i=0;i<firstpattable.length;i++){
+					firstpattable[i].setAttribute('onclick', 'apphideaddmeny()');
+				};
+			}, 500);
+		};
+		function appgetmoreinfo(nummer, id, name){
+			var addmeny = document.getElementById('addmeny');
+			var objekt = window['config'][id];
+			if(name == 'annat'){
+				objekt.push({'namn':'annat', 'inputtype':'text', 'meddelande':'Skriv önskad text nedan'})
+			};
+			for(i=0;i<objekt.length;i++){
+				if(objekt[i].namn == name){
+					if(objekt[i].inputtype != 'none'){
+						while (addmeny.firstChild) {addmeny.removeChild(addmeny.firstChild);}
+						var meddelandewrapper = document.createElement('p');
+							var meddelandewrappertext = document.createTextNode(objekt[i].meddelande);
+							meddelandewrapper.appendChild(meddelandewrappertext);
+						addmeny.appendChild(meddelandewrapper);
+						var input = document.createElement('input');
+							input.setAttribute('type', objekt[i].inputtype);
+						if(objekt[i].inputtype == 'number'){
+							input.setAttribute('value', objekt[i].startnumber);
+						};
+						addmeny.appendChild(input);
+						var ok = document.createElement('input');
+							ok.setAttribute('type', 'button');
+							ok.setAttribute('value', 'Ok');
+							ok.setAttribute('onclick', 'applaggtilltodo("' + nummer + '", "' + objekt[i].namn + '", this.parentElement.getElementsByTagName("input")[0].value, "' + id + '", "' + objekt[i].inputtype + '")');
+						addmeny.appendChild(ok);
+						var avbryt = document.createElement('input');
+							avbryt.setAttribute('type', 'button');
+							avbryt.setAttribute('value', 'Avbryt');
+							avbryt.setAttribute('onclick', 'apphideaddmeny();');
+						addmeny.appendChild(avbryt);
+					}else{
+						applaggtilltodo(nummer, objekt[i].namn, '', id, '');
+					};
+					return;
+				};
+			};
+		};
+		function applaggtilltodo(nummer, namn, string, id, type){
+			if(!string){var mellan = '';}else{
+				if(type == 'date'){
+					var mellan = ' den ';
+				}else if(type == 'time'){
+					var mellan = ' kl ';
+				}else if(type == 'number'){
+					var mellan = ' x';
+				}else{
+					var mellan = '';
+				};
+			};
+			if(namn == 'annat'){
+				var namn = '';
+			}
+			var informaiton = namn + mellan + string;
+			var informaitonsplitted = informaiton.split(' ');
+			var wrapper = document.getElementsByName(nummer + '|||||' + id)[0];
+			var li = document.createElement('li');
+				li.setAttribute('onclick', 'doubleclick("appmarkuppgift", "appremoveuppgift", this)');
+				var lip = document.createElement('p');
+					for(i=0;i<informaitonsplitted.length;i++){
+						var lipspan = document.createElement('span');
+						if(lookfordate(informaitonsplitted[i]) != 'none'){
+							lipspan.setAttribute('class', 'watch');
+							lipspan.setAttribute('data', informaitonsplitted[i]);
+						}else if(lookfortime(informaitonsplitted[i]) != 'none'){
+							lipspan.setAttribute('class', 'watch');
+							lipspan.setAttribute('data', informaitonsplitted[i]);
+						};
+						var lipspantext = document.createTextNode(informaitonsplitted[i] + ' ');
+							lipspan.appendChild(lipspantext);
+						lip.appendChild(lipspan);
+					};
+				li.appendChild(lip);
+			wrapper.appendChild(li);
+			apphideaddmeny();
+			checkallwatch();
+		};
+		function appremoveinformation(element){element.parentElement.firstChild.value = '';};
+		function appaddinformation(nummer, classname, typ, saveid){
+			var inputvalue = document.getElementById('addmeny').firstChild.value;
+			if(!inputvalue){
+				if(typ == 'date'){
+					var inputvalue = 'XXXX-XX-XX';
+				}else{
+					var inputvalue = 'XXXXXX';
+				};
+			};
+			var elementtochange = document.getElementById(nummer.replace(':', '-')).getElementsByClassName(classname)[0];
+			elementtochange.innerText = inputvalue;
+			appsavefrommeny(nummer, classname, inputvalue);
+			apphideaddmeny();	
+		};
+		function appsavefrommeny(nummer, classname, inputvalue){
+			if(classname == 'optyp'){
+				var saveid = 'optext';
+			}else if(classname == 'opdatum'){
+				var saveid = 'opdate';
+			}else if(classname == 'kost'){
+				var saveid = 'kost';
+			}else if(classname == 'kostinfo'){
+				var saveid = 'extrakost';
+			}else if(classname == 'adlinfo'){
+				var oldsave = sessionStorage.getItem(nummer + '|||||edit');
+				if(!oldsave){
+					var inputvalue = '||||||||||||||||||||' + inputvalue + '||||||||||||||||||||||||||||||||||||||||||||||||||';
+				}else{
+					var splitinfo = oldsave.split('|||||');
+					splitinfo[4] = inputvalue;
+					var inputvalue = splitinfo.join('|||||');
+				}
+				var saveid = 'edit';
+			}else if(classname == 'adlhjalpmedel'){
+				var oldsave = sessionStorage.getItem(nummer + '|||||edit');
+				if(!oldsave){
+					var inputvalue = '|||||||||||||||||||||||||' + inputvalue + '|||||||||||||||||||||||||||||||||||||||||||||';
+				}else{
+					var splitinfo = oldsave.split('|||||');
+					splitinfo[5] = inputvalue;
+					var inputvalue = splitinfo.join('|||||');
+				}
+				var saveid = 'edit';
+			}else if(classname == 'utdatum'){
+				var saveid = 'utdate';
+			}else if(classname == 'uttransport'){
+				var saveid = 'planut';
+			}else{
+				console.log('"' + classname + '": ID har inte identifierats för app...');
+			};
+			sessionStorage.setItem(nummer + '|||||' + saveid, inputvalue);
+		}
+		function apphideaddmeny(){
+			document.getElementById('addmeny').removeAttribute('style');
+			var firstpattable = document.getElementsByClassName('patienttable');
+			setTimeout(function(){
+				for(i=0;i<firstpattable.length;i++){
+					firstpattable[i].removeAttribute('onclick', 'apphideaddmeny()');
+				};
+			}, 500);
+		};
+		function appmarkuppgift(element){
+			/*var infofromtodo = element.parentElement.getAttribute('name').split('|||||');*/
+			if(element.getAttribute('style')){
+				element.removeAttribute('style');
+				element.getElementsByTagName('p')[0].removeAttribute('style');
+				/*var action = 'avmarkeras';*/
+			}else{
+				element.setAttribute('style', 'color:#bdbdbd;text-decoration:line-through;');
+				element.getElementsByTagName('p')[0].setAttribute('style', 'background-color:#FFF!important;color:#bdbdbd;font-weight:normal;');
+				/*var action = 'markeras gjord';*/
+			};
+			/*addhistory('Informaiton från ' + infofromtodo[1], action, infofromtodo[0], element.innerText);
+			save(element.parentElement);*/
+		};
+		function appremoveuppgift(element){
+			var infofromtodo = element.parentElement.getAttribute('name').split('|||||');
+			/*addhistory('Informaiton från ' + infofromtodo[1], 'tas bort', infofromtodo[0], element.innerText);*/
+			var parentname = element.parentElement;
+			element.parentElement.removeChild(element);
+			/*save(parentname);*/
+		};
+		function test(num){
+			var number = num.replace('-', ':');
+			var initialer = 'E:A';
+			var alder = '81';
+			var kon = 9794;//String.fromCharCode(9792)
+			var icons = ['antibiotbeh', 'apodos', 'blod'];
+			var opdatum = '2016-10-07';
+			var optyp = 'Dekompression';
+			var bakgrundinfo = 'Meningit, Hepatit...';
+			var kost = 'A-kost';
+			var kostinfo = 'Vegetatiskt';
+			var adlinfo = 'Behov i och ur säng';
+			var adlhjalpmedel = 'Rullator';
+			var aktuellt = 'Jobba för hemgång';
+			var uppgiftellerkontroll = [{
+					namn: 'uppgifter',
+					elements: ['Hoppa hage', 'leka i sanden', 'Sårkontroll den 2016-08-12']
+				},{
+					namn: 'kontroller',
+					elements: ['MEWS', 'Temp']
+				}];
+			var utdatum = '2016-10-22';
+			var planhemanteck = 'Ring anhöriga';
+			var uttransport = 'Liggande transport';
+			var anteckningar = 'Vad ska jag göra om en stund?';
+			apppasteinfo(number, initialer, alder, kon, icons, opdatum, optyp, bakgrundinfo, kost, kostinfo, adlinfo, adlhjalpmedel, aktuellt, uppgiftellerkontroll, utdatum, planhemanteck, uttransport, anteckningar);	
+		};
+		function loadallsession(){
+			for (var i = config.roomnumbers.length - 1; i >= 0; i--) {
+				apploadsession(i);
+			};
+		};
+		function apploadsession(i){
+			if(!sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||edit')){var patbladinfo = ['', '', '', '', '', ''];}else{
+				var patbladinfo = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||edit').split('|||||');
+			};
+			var obj = {};
+			var alltocheck = ['namn', 'opdate', 'optext', 'kost', 'extrakost', 'aktuellt', 'utdate', 'utinfo', 'anteckningar'];
+			for(a=0;a<alltocheck.length;a++){
+				if(!sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||' + alltocheck[a])){
+					var informaiton = '';
+				}else{
+					var informaiton = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||' + alltocheck[a]);	
+				};
+				obj[alltocheck[a]] = informaiton;
+			};
+			var number = config.roomnumbers[i].replace('-', ':');
+			if(!sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||alder')){
+				var alder = '';
+			}else{
+				var alder = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||alder').substring(1);	
+			};
+			if(!sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||gender')){
+				var kon = '';
+			}else{
+				var gender = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||gender').split('-');
+				if(gender[0] == '1'){var kon = 9794;}else if(gender[1] == '1'){var kon = 9792;}else{var kon = '';};
+			};
+			var icons = [];
+			for(a=0;a<config.icotodo.length;a++){
+				if(!sessionStorage.getItem('ico|||||' + config.roomnumbers[i].replace(':', '-') + '|||||' + config.icotodo[a].namn)){}else{
+					icons.push(config.icotodo[a].namn);
+				};
+			};
+			var bakgrundinfo = patbladinfo[2] + '. ' + patbladinfo[3];
+			var adlinfo = patbladinfo[4];
+			var adlhjalpmedel = patbladinfo[5];
+			var uppgiftellerkontroll = [{namn: 'uppgifter',elements: []},{namn: 'kontroller',elements: []}];
+			for(b=0;b<uppgiftellerkontroll.length;b++){
+				if(sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||' + uppgiftellerkontroll[b].namn)){
+					var allakontroller = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||' + uppgiftellerkontroll[b].namn).split('||||||||||');
+					for(a=1;a<allakontroller.length;a++){
+						var splitinfo = allakontroller[a].split('|||||');
+						uppgiftellerkontroll[b].elements.push(splitinfo[0]);
+					};
+				};
+			};
+			if(!sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||planut')){
+				var uttransport = '';
+			}else{
+				var uttransportnummer = sessionStorage.getItem(config.roomnumbers[i].replace(':', '-') + '|||||planut');
+				var uttransport = config.hemtransport[parseInt(uttransportnummer) - 1];
+			};
+			apppasteinfo(number, obj.namn, alder, kon, icons, obj.opdate, obj.optext, bakgrundinfo, obj.kost, obj.extrakost, adlinfo, adlhjalpmedel, obj.aktuellt, uppgiftellerkontroll, obj.utdate, obj.utinfo, uttransport, obj.anteckningar);
+		};
+		/*
+		apppasteinfo("R-4","", "97")
+		apppasteinfo("r-4", "E-S", alder, kon, icons, opdatum, optyp, bakgrundinfo, kost, kostinfo, adlinfo, adlhjalpmedel, aktuellt, uppgiftellerkontroll, utdatum, planhemanteck, uttransport, anteckningar)
+		*/
+		function addinfo(id, message){//apppasteinfo('1:2');
+			if(id.split('|||||')[0] == 'icotext'){
+				var number = id.split('|||||')[1];
+				var todo = 'icotext';
+			}else if(id.split('|||||')[0] == 'ico'){
+				var number = id.split('|||||')[1];
+				var todo = 'ico';
+			}else{
+				var number = id.split('|||||')[0];
+				var todo = id.split('|||||')[1];
+			};
+			var wrapper = document.getElementById(number.replace(':', '-'));
+			if(!wrapper){return 'Önskad säng hittades inte..'};
+			if(todo == 'namn'){
+				var span = wrapper.getElementsByClassName('namn')[0].innerText = message;
+			}else if(todo == 'alder'){
+				var span = wrapper.getElementsByClassName('alder')[0].innerText = message;
+			}else if(todo == 'gender'){
+				var kon = message.split('-');
+				var m = kon[0];
+				var k = kon[1];
+				if(m == '1'){
+					var ikon = String.fromCharCode(9794);
+				}else if(k == '1'){
+					var ikon = String.fromCharCode(9792);
+				}else{
+					var ikon = 'X';
+				};
+				var span = wrapper.getElementsByClassName('kon')[0].innerText = ikon;
+			}else if(todo == 'ico'){
+				/*split('|||||')*/
+				/*[0] = namn*/
+				/*[1] = info*/
+			}else if(todo == 'icotext'){
+				/*array*/
+				/*split('|||||')*/
+			}else if(todo == 'opdate'){
+
+			}else if(todo == 'optext'){
+
+			}else if(todo == 'edit'){
+				/*1|||||2|||||3|||||4|||||5|||||6|||||7|||||8|||||*/
+				/*var info = message.split('|||||');
+				var s = info[0] + ' ' + info[1];
+				var b = info[2] + ' ' + info[3];
+				var a = info[4] + ' ' + info[5];
+				var a = info[6] + ' ' + info[7];*/
+			}else if(todo == 'kost'){
+
+			}else if(todo == 'extrakost'){
+
+			}else if(todo == 'aktuellt'){
+
+			}else if(todo == 'color'){
+
+			}else if(todo == 'uppgifter'){
+
+			}else if(todo == 'kontroller'){
+
+			}else if(todo == 'utdate'){
+
+			}else if(todo == 'utinfo'){
+
+			}else if(todo == 'planut'){
+
+			}else if(todo == 'vplimg'){
+
+			}else{
+				console.log(todo + ' kunde inte hittas. Därav läggs inte informationen till.')
+			};
+		};
+		function apppasteinfo(number, initialer, alder, kon, icons, opdatum, optyp, bakgrundinfo, kost, kostinfo, adlinfo, adlhjalpmedel, aktuellt, uppgiftellerkontroll, utdatum, planhemanteck, uttransport, anteckningar){
+			var wrapper = document.getElementById(number.replace(':', '-'));
+			if(!wrapper){return 'Önskad säng hittades inte..'};
+			if(!initialer && !alder){return 'Eftersom namn och/eller ålder inte är sagt läggs inte informaitonen till.'};
+			var listelement = document.getElementsByName('list|||||' + number.replace(':', '-'))[0].getElementsByClassName('default')[0];
+			apptabortpatient(listelement, number.replace(':', '-'));
+			if(!initialer){var initialer = 'X:X';};
+			if(!alder){var alder = 'XX';};
+			if(!kon){var kon = 88;};
+			if(!icons){var icons = [];};
+			if(!opdatum){var opdatum = 'XXXX-XX-XX';};
+			if(!optyp){var optyp = 'XXX';};
+			if(!bakgrundinfo){var bakgrundinfo = 'Frisk';};
+			if(!kost){var kost = 'XXX';};
+			if(!kostinfo){var kostinfo = 'XXX';};
+			if(!adlinfo){var adlinfo = 'XXX';};
+			if(!adlhjalpmedel){var adlhjalpmedel = 'XXX';};
+			if(!aktuellt){var aktuellt = '';};
+			if(!uppgiftellerkontroll){var uppgiftellerkontroll = [{
+					namn: 'uppgifter',
+					elements: []
+				},{
+					namn: 'kontroller',
+					elements: []
+				}];
+			};
+			if(!utdatum){var utdatum = 'XXXX-XX-XX';};
+			if(!planhemanteck){var planhemanteck = '';};
+			if(!uttransport){var uttransport = 'XXX';};
+			if(!anteckningar){var anteckningar = '';};
+
+			var listwrapper = document.getElementsByName('list|||||' + number.replace(':', '-'))[0];
+				listwrapper.getElementsByClassName('listname')[0].innerText = initialer;
+			for(i=0;i<listwrapper.getElementsByTagName('input').length;i++){
+				listwrapper.getElementsByTagName('input')[i].removeAttribute('disabled');
+			};
+			wrapper.getElementsByClassName('patientdata')[0].innerText = ' ' + initialer + ' -' + alder + ' ' + String.fromCharCode(kon);
+			var obswrapper = wrapper.getElementsByClassName('obsicons')[0];
+			for(i=0;i<icons.length;i++){
+				for(b=0;b<config.icotodo.length;b++){
+					if(config.icotodo[b].namn == icons[i]){
+						var title = config.icotodo[b].title;
+					};
+				};
+				var obsimg = document.createElement('img');
+					obsimg.setAttribute('src', config.icolink[0] + icons[i] + config.icolink[1]);
+					obsimg.setAttribute('data-namn', icons[i]);
+					obsimg.setAttribute('title', title);
+				obswrapper.appendChild(obsimg);
+			};
+			var opinfowrapper = wrapper.getElementsByClassName('opinfo')[0];
+				var opinfowrappertext = document.createTextNode('Operation: ');
+				opinfowrapper.appendChild(opinfowrappertext);
+				var opinfowrapperdate = document.createElement('span');
+					opinfowrapperdate.setAttribute('class', 'opdatum');
+					opinfowrapperdate.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "date");');
+					var opinfowrapperdatetext = document.createTextNode(opdatum);
+					opinfowrapperdate.appendChild(opinfowrapperdatetext);
+				opinfowrapper.appendChild(opinfowrapperdate);
+				var opinfowrapperspace = document.createTextNode(' ');
+				opinfowrapper.appendChild(opinfowrapperspace);
+				var opinfowrappertyp = document.createElement('span');
+					opinfowrappertyp.setAttribute('class', 'optyp');
+					opinfowrappertyp.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text", "ingrepp");');
+					var opinfowrappertyptext = document.createTextNode(optyp);
+					opinfowrappertyp.appendChild(opinfowrappertyptext);
+				opinfowrapper.appendChild(opinfowrappertyp);
+			var bakgrundwrapper = wrapper.getElementsByClassName('bakgrund')[0];
+				var bakgrundwrappertext = document.createTextNode('Sedan tidigare: ');
+				bakgrundwrapper.appendChild(bakgrundwrappertext);
+				var bakgrundwrapperbakgrundinfo = document.createElement('span');
+					bakgrundwrapperbakgrundinfo.setAttribute('class', 'bakgrundinfo');
+					bakgrundwrapperbakgrundinfo.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text");');
+					var bakgrundwrapperbakgrundinfotext = document.createTextNode(bakgrundinfo);
+					bakgrundwrapperbakgrundinfo.appendChild(bakgrundwrapperbakgrundinfotext);
+				bakgrundwrapper.appendChild(bakgrundwrapperbakgrundinfo);
+			var nutritionwrapper = wrapper.getElementsByClassName('nutrition')[0];
+				var nutritionwrapperkost = document.createElement('span');
+					nutritionwrapperkost.setAttribute('class', 'kost');
+					nutritionwrapperkost.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text", "kost");');
+					var nutritionwrapperkosttext = document.createTextNode(kost);
+					nutritionwrapperkost.appendChild(nutritionwrapperkosttext);
+				nutritionwrapper.appendChild(nutritionwrapperkost);
+				var nutritionwrapperspace = document.createTextNode(': ');
+				nutritionwrapper.appendChild(nutritionwrapperspace);
+				var nutritionwrapperkostinfo = document.createElement('span');
+					nutritionwrapperkostinfo.setAttribute('class', 'kostinfo');
+					nutritionwrapperkostinfo.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text");');
+					var nutritionwrapperkostinfotext = document.createTextNode(kostinfo);
+					nutritionwrapperkostinfo.appendChild(nutritionwrapperkostinfotext);
+				nutritionwrapper.appendChild(nutritionwrapperkostinfo);
+			var adlwrapper = wrapper.getElementsByClassName('adl')[0];
+				var adlfirsttext = document.createTextNode('ADL: ');
+				adlwrapper.appendChild(adlfirsttext);
+				var adlinfoelement = document.createElement('span');
+					adlinfoelement.setAttribute('class', 'adlinfo');
+					adlinfoelement.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text");');
+					var adlinfoelementtext = document.createTextNode(adlinfo);
+					adlinfoelement.appendChild(adlinfoelementtext);
+				adlwrapper.appendChild(adlinfoelement);
+				var adlmellantext = document.createTextNode(', ');
+				adlwrapper.appendChild(adlmellantext);
+				var adlhjalpmedelelement = document.createElement('span');
+					adlhjalpmedelelement.setAttribute('class', 'adlhjalpmedel');
+					adlhjalpmedelelement.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "text");')
+					var adlhjalpmedelelementtext = document.createTextNode(adlhjalpmedel)
+					adlhjalpmedelelement.appendChild(adlhjalpmedelelementtext);
+				adlwrapper.appendChild(adlhjalpmedelelement);
+			var aktuelltwrapper = wrapper.getElementsByClassName('aktuellt')[0];
+				var aktuellthead = document.createElement('h3');
+					var aktuelltheadtext = document.createTextNode('Aktuellt');
+					aktuellthead.appendChild(aktuelltheadtext);
+				aktuelltwrapper.appendChild(aktuellthead);
+				var aktuelltedit = document.createElement('div');
+					aktuelltedit.setAttribute('class', 'editabel');
+					aktuelltedit.setAttribute('contenteditable', 'true');
+					aktuelltedit.setAttribute('onkeyup', 'appsaveeditable("' + number.replace(':', '-') + '", "aktuellt", this)');
+					//nummer, id, element
+					var aktuelltedittext = document.createTextNode(aktuellt);
+					aktuelltedit.appendChild(aktuelltedittext);
+				aktuelltwrapper.appendChild(aktuelltedit);
+			for(a=0;a<uppgiftellerkontroll.length;a++){
+				var uppgifterwrapper = wrapper.getElementsByClassName(uppgiftellerkontroll[a].namn)[0];
+					uppgifterwrapper.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "button", "' + uppgiftellerkontroll[a].namn + '");');
+					var uppgifterhead = document.createElement('h3');
+						var uppgifterheadtext = document.createTextNode(uppgiftellerkontroll[a].namn.capitalizeFirstLetter());
+						uppgifterhead.appendChild(uppgifterheadtext);
+					uppgifterwrapper.appendChild(uppgifterhead);
+					var uppgifterul = document.createElement('ul');
+						uppgifterul.setAttribute('class', 'todolist');
+						uppgifterul.setAttribute('name', number.replace(':', '-') + '|||||' + uppgiftellerkontroll[a].namn);
+					uppgifterwrapper.appendChild(uppgifterul);
+					for (var i = uppgiftellerkontroll[a].elements.length - 1; i >= 0; i--) {
+						applaggtilltodo(number.replace(':', '-'), uppgiftellerkontroll[a].elements[i], '',uppgiftellerkontroll[a].namn, '');
+					};
+			};
+			var planhem = wrapper.getElementsByClassName('planhem')[0];
+				var planhemhead = document.createElement('h3');
+					var planhemheadtext = document.createTextNode('Utskrivningsplan');
+					planhemhead.appendChild(planhemheadtext);
+				planhem.appendChild(planhemhead);
+				var utdatump = document.createElement('p');
+					var utdatumptext = document.createTextNode('Planerad utskrivning: ')
+					utdatump.appendChild(utdatumptext);
+					var utdatumpspan = document.createElement('span');
+						utdatumpspan.setAttribute('class', 'utdatum');
+						utdatumpspan.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "date");');
+						var utdatumpspaninfo = document.createTextNode(utdatum);
+						utdatumpspan.appendChild(utdatumpspaninfo);
+					utdatump.appendChild(utdatumpspan);
+				planhem.appendChild(utdatump);
+				var planhemanteckhead = document.createElement('p');
+					var planhemanteckheadtext = document.createTextNode('Antecknignar:');
+					planhemanteckhead.appendChild(planhemanteckheadtext);
+				planhem.appendChild(planhemanteckhead);
+				var planhemanteckedit = document.createElement('div');
+					planhemanteckedit.setAttribute('class', 'editabel');
+					planhemanteckedit.setAttribute('contenteditable', 'true');
+					planhemanteckedit.setAttribute('onkeyup', 'appsaveeditable("' + number.replace(':', '-') + '", "utinfo", this)');
+					var planhemanteckeditinfo = document.createTextNode(planhemanteck)
+					planhemanteckedit.appendChild(planhemanteckeditinfo);
+				planhem.appendChild(planhemanteckedit);
+				var planhemtransp = document.createElement('p');
+					var planhemtransptext = document.createTextNode('Transport hem: ');
+					planhemtransp.appendChild(planhemtransptext);
+					var planhemtranspspan = document.createElement('span');
+						planhemtranspspan.setAttribute('class', 'uttransport');
+						planhemtranspspan.setAttribute('onclick', 'appmenyadd("' + number.replace(':', '-') + '", this, "select", "hemtransport");');
+						var planhemtranspspantext = document.createTextNode(uttransport);
+						planhemtranspspan.appendChild(planhemtranspspantext);
+					planhemtransp.appendChild(planhemtranspspan);
+				planhem.appendChild(planhemtransp);
+			var anteckningarwrapper = wrapper.getElementsByClassName('anteckningar')[0];
+				var anteckningarhead = document.createElement('h3');
+					var anteckningarheadtext = document.createTextNode('Egna Anteckningar');
+					anteckningarhead.appendChild(anteckningarheadtext);
+				anteckningarwrapper.appendChild(anteckningarhead);
+				var anteckningaredit = document.createElement('p');
+					anteckningaredit.setAttribute('class', 'editabel');
+					anteckningaredit.setAttribute('contenteditable', 'true');
+					anteckningaredit.setAttribute('onkeyup', 'appsaveeditable("' + number.replace(':', '-') + '", "egnaanteckningar", this)');
+					var anteckningareditinfo = document.createTextNode(anteckningar);
+					anteckningaredit.appendChild(anteckningareditinfo);
+				anteckningarwrapper.appendChild(anteckningaredit);
+		};
+		function appchangeview(tochange){
+			document.getElementById('laggtill').style.display = 'none';
+			document.getElementById('list').style.display = 'none';
+			document.getElementById('content').style.display = 'none';
+			document.getElementById(tochange).style.display = 'block';
+			document.getElementById('menywrapper').style.display = 'none';
+		};
+		function appsaveeditable(nummer, id, element){
+			sessionStorage.setItem(nummer.replace(':', '-') + '|||||' + id, element.innerText);
+		};
+		function login() {
+			var username = document.getElementsByName('loginname')[0].value;
+			if(username.length == 0){
+				return false;
+			}else{
+				socket.emit('user', username);
+				hidelogin();
+			};
+		};
+	</script>
+	<style type="text/css">
+		body, html{
+			margin:0px;
+			padding:0px;
+			background-color: #000;
+		}
+		.patienttable, .patientlist{
+			margin:10px;
+			background-color: #FFF;
+			padding:5px;
+		}
+		#menycontainer{
+			position: fixed;
+		    left: 0px;
+		    top: 0px;
+		    width: 100%;
+		}
+		#menywrapper {
+			background-color: lightgray;
+		}
+		#menybutton, #menywrapper table tr td{
+			text-align: center;
+		}
+		#menywrapper table{
+			width:100%;
+		}
+		#menybutton {
+			height: 20px;
+			background-color: red;
+		}
+		#content, #list, #laggtill{
+			padding-top: 20px;
+font-size: 20px;
+		}
+		.head h2{
+			display: inline-block;
+			height:59px;
+			margin-top: 0px;
+			margin-bottom: 0px;
+font-size: 30px;
+		}
+		.head img{
+			float: right;
+		}
+		h3{
+			margin-bottom: 0px;
+font-size: 25px;
+		}
+		p{
+			margin:0px;
+			padding:0px;
+		}
+		ul{
+			margin-top:0px;
+			padding-top:0px;
+			margin-bottom:0px;
+			padding-bottom:0px;
+		}
+		.editabel{
+			background-color: lightgray;
+		}
+		#addmeny{
+			padding-bottom: 40px;
+		    text-align: center;
+		    position: fixed;
+		    left: 0px;
+		    bottom: 0px;
+		    width: 100%;
+		    border-style: solid;
+		    border-width: 5px 0px 0px 0px;
+		    background-color: lightgray;
+		    display: none;
+		}
+		.imgdeactive{
+			opacity: 0.5;
+		}
+		#laggtill, #list{
+			display: none;
+		}
+		#content, #list, #menywrapper{
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			-o-user-select: none;
+			user-select: none;
+		}
+		.editabel{
+			-webkit-user-select: text;
+			-moz-user-select: text;
+			-ms-user-select: text;
+			-o-user-select: text;
+			user-select: text;
+		}
+		#wrapper{
+			display: none;
+		}
+		.lateinfo{
+			background-color: red;
+		}
+		.todayinfo{
+			background-color: yellow;
+		}
+	</style>
+</head>
+<body onload="apponload();">
+<div id="login">
+	<input type="text" name="loginname"><br/>
+	<input type="button" value="Logga In" onclick="login();" name="">
+</div>
+<div id="wrapper">
+<div id="menycontainer">
+	<div id="menywrapper" style="display: none;">
+		<table>
+			<tr>
+				<td>
+					<img src="filer/meny/icon1.png" onclick="appchangeview('laggtill')">
+				</td>
+				<td>
+					<img src="filer/meny/icon2.png" onclick="appchangeview('list')">
+				</td>
+				<td>
+					<img src="filer/meny/icon3.png" onclick="appchangeview('content')">
+				</td>
+				<td>
+					<img src="filer/meny/icon4.png" style="opacity:0.2;">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Lägg till
+				</td>
+				<td>
+					Patientlista
+				</td>
+				<td>
+					Patientblad
+				</td>
+				<td>
+					Avsluta
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="menybutton" onclick="apptogglemeny();">&#9868;</div>
+</div>
+<div id="content">
+</div>
+<div id="list">
+</div>
+<div id="laggtill">
+	<div class="patientlist">
+		<p>Plats</p>
+		<select name="number" id="laggtillnummer"></select>
+		<p>Initialer</p>
+		<input type="text" name="initialer">
+		<p>Födelse år</p>
+		<input type="tel" name="alder">
+		<p>Kön</p>
+		<select name="kon">
+			<option value=""></option>
+			<option value="9794">&#9794;</option>
+			<option value="9792">&#9792;</option>
+		</select>
+	</div>
+	<div class="patientlist" id="laggtillicons" name="icons">
+	</div>
+	<div class="patientlist">
+		<p>Operations datum</p>
+		<input type="date" name="opdatum">
+		<p>Operations typ</p>
+		<input type="text" name="optyp">
+	</div>
+	<div class="patientlist">
+		<p>Tidigare sjukdomar/diagnoser/operationer</p>
+		<input type="text" name="bakgrundinfo">
+	</div>
+	<div class="patientlist">
+		<p>Kost</p>
+		<input type="text" name="kost">
+		<p>Kost information</p>
+		<input type="kostextra" name="kostinfo">
+	</div>
+	<div class="patientlist">
+		<p>ADL</p>
+		<input type="text" name="adlinfo">
+		<p>Hjälpmedel</p>
+		<input type="text" name="adlhjalpmedel">
+	</div>
+	<div class="patientlist">
+		<p>Aktuellt</p>
+		<textarea name="aktuellt"></textarea>
+	</div>
+	<div class="patientlist">
+		<p>Uppgifter</p>
+		<div class="uppgifterelement"><input type="text" name="uppgifter"><input type="button" value="+" name=""onclick="applaggtilladdline(this)"><input type="button" value="-" name="" onclick="applaggtillremoveline(this)"></div>
+	</div>
+	<div class="patientlist">
+		<p>Kontroller</p>
+		<div class="kontrollerelement"><input type="text" name="kontroller"><input type="button" value="+" name="" onclick="applaggtilladdline(this)"><input type="button" value="-" name="" onclick="applaggtillremoveline(this)"></div>
+	</div>
+	<div class="patientlist">
+		<p>Planerat utdatum</p>
+		<input type="date" name="utdatum">
+		<p>Hemplanerings anteckningar</p>
+		<textarea name="planhemanteck"></textarea>
+		<p>Uttransport</p>
+		<select name="uttransport" id="laggtilluttransport"></select>
+	</div>
+	<div class="patientlist">
+		<p>Egna anteckningar</p>
+		<textarea name="anteckningar"></textarea>
+	</div>
+	<div class="patientlist">
+	<input type="button" value="Lägg till" onclick="applaggtillpat()" name="">
+	</div>
+</div>
+<div id="historikwrapper">
+</div>
+<div id="addmeny">
+
+</div>
+<div id="contentwrapper">
+</div>
+</div>
+<script type="text/javascript">
+		//Tar server id enbart för att koppla till socket
+		var geturl = window.location.href.replace('http://', '').split('/')[0];
+		//Lyssnar om server säger något
+		var socket = io.connect(geturl);
+		//Tar mot info från server
+		socket.on('textarea', function(message) {
+			sessionStorage.setItem(message.id, message.info);
+			loadallsession();
+			checkallwatch();
+			/*var idsplit = message.id.split('|||||');
+			if(idsplit[1] == 'namn'){
+				var wrapper = document.getElementsByClassName('sangnr' + idsplit[0])[0].getElementsByClassName('namn')[0];
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var namntext = document.createTextNode(message.info);
+					wrapper.appendChild(namntext);
+				var option = document.getElementById('optionny' + idsplit[0]);
+					while (option.hasChildNodes()) {option.removeChild(option.firstChild);};
+					var optiontext = document.createTextNode(idsplit[0] + ' ' + message.info);
+					option.appendChild(optiontext);
+			}else if(idsplit[1] == 'kontroller'){
+				addtolist(idsplit, message, 'kontroller');
+			}else if(idsplit[1] == 'uppgifter'){
+				addtolist(idsplit, message, 'uppgifter');
+			};*/
+		});
+		//Om inte användare är godkänd får den en alert...
+		socket.on('connectioninfo', function(message) {
+			showlogin();
+		});
+		//Funktion som skickar förändad text till servern
+		function synctext(element) {
+			if(!element.value){
+				socket.emit('textarea', {id: element.getAttribute('name'), info: element.innerHTML, type: 'html'});
+			}else{
+				socket.emit('textarea', {id: element.getAttribute('name'), info: element.value, type: 'text'});	
+			};
+		};
+		//Om anslutning försvinner till server
+		socket.on('disconnect', function () {
+			showlogin();
+		});
+		//Om användare inte får redigera
+		socket.on('readonly', function(message) {
+			showlogin();
+		});
+		function showlogin() {
+			location.reload();
+		};
+		function hidelogin() {
+			document.getElementById('login').style.display = 'none';
+			document.getElementById('wrapper').style.display = 'block';
+			//document.getElementsByClassName('nyttelement')[0].removeAttribute('style');
+		};
+		window.onscroll = function() {
+
+		};
+	</script>
+</body>
+</html>

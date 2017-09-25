@@ -1,0 +1,534 @@
+<html>
+	<head>
+		<title>Digital whiteboard</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="shortcut icon" href="filer/icons/icon.ico" />
+		<link rel="icon" type="image/vnd.microsoft.icon" href="filer/icons/icon.ico" />
+		<link rel="icon" type="image/png" href="filer/icons/icon196x196.png" />
+		<link rel="apple-touch-icon-precomposed" href="filer/icons/icon180x180.png"/>
+		<link rel="apple-touch-icon-precomposed" sizes="76x76" href="filer/icons/icon76x76.png">
+		<link rel="apple-touch-icon-precomposed" sizes="120x120" href="filer/icons/icon120x120.png">
+		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="filer/icons/icon152x152.png.png">
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="application/javascript" src="filer/config.js"></script>
+		<script type="application/javascript" src="filer/nyheter.js"></script>
+		<script type="application/javascript" src="filer/main.js"></script>
+		<link rel="stylesheet" type="text/css" href="filer/style.css">
+		<style type="text/css" media="print" id="print">
+			@page { size: landscape; }
+		</style>
+	</head>
+	<body onload="onload();">
+		<div id="moreinfotop"></div>
+		<div id="moreinfobottom"></div>
+		<input type="text" id="deselect" onchange="removedeselect(this);">
+		<div id="alert" style="display: none;"><p>Test text</p><input type="button" value="Ja"><input type="button" value="Nej" onclick="closealert()"></div>
+		<div id="patblad"><input type="button" value="Spara & Stäng" onclick="closepatblad();"><br/></div>
+		<div id="attgoracontainer"></div>
+		<div id="minisbarcontainer"></div>
+		<div id="nutritioncontainer"><h1>Nutrition!</h1></div>
+		<div id="contentwrapper">
+			<div class="spacer"></div>
+			<table>
+				<thead>
+					<tr class="tableroom">
+						<td>
+							Rum	
+						</td>
+						<td>
+							Patient
+						</td>
+						<td>
+							OP-datum
+						</td>
+						<td>
+							Aktuellt
+						</td>
+						<td>
+							Uppgifter
+						</td>
+						<td>
+							Kontroller
+						</td>
+						<td>
+							Nutrition
+						</td>
+						<td>
+							OBS
+						</td>
+						<td>
+							Utskrivningsplan
+						</td>
+						<td colspan="4" id="menyknapp">
+							<input type="button" onclick="showhide('meny');" value="&#9776;">
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					
+				</tbody>
+			</table>
+			<div class="spacer"></div>
+		</div>
+		<div id="iconmenu" style="display: none;">
+			<div id="move"></div>
+			<div id="kontroller"></div>
+			<div id="iconinfo"></div>
+		</div>
+		<div id="meny" class="menytopright">
+			<h2>Meny</h2>
+			<input type="button" value="Spara loggfil" onclick="showhide('meny');saveall();"><br/>
+			<!--<input type="button" value="Ladda loggfil" onclick="showhide('meny');startloadlogg();"><br/>
+			<input type="button" value="Ta bort all information" onclick="showhide('meny');removesave();"><br/>-->
+			<input type="button" value="Inställningar" onclick="showhide('installningar');"><br/>
+			<input type="button" value="Standard vårdplan" onclick="showhide('vardplaninstallning');"><br/>
+			<input type="button" value="Skapa Lösenord" id="andralosen" onclick="showhide('password');"><br/>
+			<input type="button" value="Visa/Dölj/Färga sängar" onclick="showhide('doljsangar');"><br/>
+			<!--<input type="button" value="Skriv ut SBAR" onclick="showhide('meny');skrivut('sbar');"><br/>
+			<input type="button" value="Skriv ut Att göra lista" onclick="showhide('meny');skrivut('attgora');"><br/>
+			<input type="button" value="Skriv ut Nutrition" onclick="showhide('meny');skrivut('nutrition');"><br/>-->
+			<!--<input type="button" value="Information" onclick="showhide('information');"><br/>-->
+			<input type="button" value="Skriv ut" onclick="showhide('skrivut');"><br/>
+			<input type="button" value="Historik" onclick="showhide('historik');"><br/>
+			<input type="button" value="Ikon beskrivning" onclick="showhide('icobeskrivning');"><br/><br/>
+			<!--<input type="button" value="Nyheter" onclick="showhide('nyheter');"><br/><br/>-->
+			<input type="button" value="Stäng" onclick="showhide('meny');"><br/>
+		</div>
+		<div id="skrivut" class="menytopright">
+			<h2>Skriv ut</h2>
+			<input type="button" value="SBAR" onclick="showhide('skrivut');skrivut('sbar');"><br/>
+			<input type="button" value="SBAR-mini" onclick="showhide('skrivut');skrivut('sbarmin');"><br/>
+			<input type="button" value="Att göra lista" onclick="showhide('skrivut');skrivut('attgora');"><br/>
+			<input type="button" value="Nutrition" onclick="showhide('skrivut');skrivut('nutrition');"><br/><br/>
+			<input type="button" value="Stäng" onclick="showhide('skrivut');"><br/>
+		</div>
+		<div id="nyheter" class="menyfast">
+			<input type="button" value="Stäng" onclick="showhide('nyheter');">
+			<h2>Nyheter</h2>
+		</div>
+		<div id="historik" class="menytopright">
+			<h2>Historia</h2>
+			<div id="historikwrapper"></div>
+			<input type="button" value="Stäng" onclick="showhide('historik');">
+		</div>
+		<div id="passwordload" class="menytopright">
+			<p>Information är lösenordsskyddad!</p>
+			<p>Var god skriv in lösenord.</p>
+			<input type="password" class="dontsave"><br/>
+			<input type="button" value="Ok" onclick="uncodethelogg(this);"><input type="button" value="Avbryt" onclick="this.parentElement.getElementsByTagName('input')[0].value = '';showhide('passwordload');">
+		</div>
+		<div id="password" class="menytopright">
+				<p>Skriv önskat lösenord</p>
+				<input type="password" class="dontsave"><br/>
+				<p>Upprepa lösenord</p>
+				<input type="password" class="dontsave"><br/>
+				<input type="button" value="Ok" onclick="savepassword(this);"><input type="button" value="Avbryt" onclick="this.parentElement.getElementsByTagName('input')[0].value = '';showhide('password');">
+		</div>
+		<div id="doljsangar" class="menytopright">
+			<h2>Visa/Dölj/Färga sängar</h2>
+		</div>
+		<div id="icobeskrivning" class="menyfast"><input type="button" value="Stäng" onclick="showhide('icobeskrivning');"></div>
+		<div id="information" class="menyfast">
+			<input type="button" value="Stäng" onclick="showhide('information');">
+			<h1>Information</h1>
+			<h2>Vem/Vad är detta</h2>
+			<p>Detta är ett projekt startat av Framtidens Vårdavdelning 349a Sahlgrenska Göteborg. Skaparen av denna sida är Mattias Lidbeck och liknande projekt kan ses på hans sida <a href="www.teddyprojekt.tk">www.teddyprojekt.tk</a>.</p>
+			<p>Denna sida är skapad för att ersätta nuvarande Whiteboard tavlor. Den är skapad utifrån avdelningens patientklientel, men har även kapacitet att ändras till andra avdelningars specifika behov, i inställningar.</p>
+			<p>Projektet "Översikt" började innan sommaren 2016 och är i skrivande stund (2016-09-15) inte testad i verklig miljö.</p>
+			<p>Redigerades senast den <span id="datumsenastredigerad">XX-XX-XX</span>.</p>
+			<h2>Sekretess</h2>
+			<h3>Uppbyggnad</h3>
+			<p>Denna översikt är byggd enligt en vanlig webbsida. Den är enbart utvecklad att tänka och arbeta på klientdatorn, det innebär att ingen information skickas utanför datorn, översiken visas på. Allt tänkande görs på datorn som visar översikten.</p>
+			<h3>Lokal start</h3>
+			<p>Webbsidan om så önskas kan startas från hårddisken, likt ett vanligt program, den kan även laddas från en önskad webbserver, utan att läcka information över nätverk.</p>
+			<h3>Var info sparas</h3>
+			<p>All information sparas tillfälligt lokalt i något som kallas ”sessionStorage”, det innebär att informationen finns på datorns tillfälliga minne på hårddisken så länge webbläsaren inte sängs ner. Uppdateras sidan, finns fortfarande informationen kvar (även om varning även då visas).</p>
+			<h3>Loggfiler</h3>
+			<p>För att säkerställa att inte information försvinner sparas loggfil automatiskt när webbsidan stängs ner eller uppdateras. Om t.ex. datorn skulle gå sönder, kan användaren i inställningar välja hur ofta loggfiler skall sparas, i startinställningarna är denna funktion stoppad och användaren själv måste välja intervall. Spara loggfil kan även göras manuellt i menyn. Loggfilen innehåller all information som lagts till i översikten. Texten i loggfilen kan inte läsas direkt utan måste laddas via översikten.</p>
+			<h3>Lösenord</h3>
+			<p>För att säkerställa att information från loggfilen inte kommer i fel händer, kan användaren ställa in ett lösenord. Denna i sin tur är med i processen då loggfil sparas och krypterar loggfilen. Observera glömt lösenord kan inte fås tillbaka! Lösenord måste skrivas rätt för att informationen skall kunna läsas av översikten. Denna funktion är inte inställd vid start, utan användaren måste själv ställa in önskat lösenord, vilket kan göras via menyn.</p>
+			<h2>Loggfunktion</h2>
+			<h3>Spara loggfil</h3>
+			<p>Observera att filerna automatiskt sparas i "nedladdningsmappen" på datorn. Platsen kan ändras i webbläsarens inställningar. Kommer konstant en popup fram från webbläsaren om att du ska välja var filen ska sparas, kan detta också ändras i inställningar, att de ska ske automatiskt.</p>
+			<p>Loggen är en textfil (.txt) och får namn efter datum och tid. Detta innebär att nedladdningsrutan visas då filen skapas på sidan och sedan läggs på hårddisken. Ett sätt att få bort nedladdningsmenyn är att ha ett plugin som automatiskt rensar nedladdningshistoriken. Exempel på detta är: <a href="https://chrome.google.com/webstore/detail/always-clear-downloads/cpbmgiffkljiglnpdbljhlenaikojapc" target="_blank">Always Clear Downloads</a>.</p>
+			<h3>Ladda loggfil</h3>
+			<p>Klicka på knappen i menyn. Webbläsarens fil-väljare kommer fram. Navigera till mapp där loggfilerna sparas. Dubbelklicka på senaste (eller önskade) loggfilen. Om sedan innan lösenord är inställd, måste du nu fylla i denna. Stämmer inte lösenord, händer inget. Om lösenord stämmer eller inget är satt sedan innan laddas informationen direkt.</p>
+			<h2>Dynamisk/flexibel</h2>
+			<p>Översikten är byggd för att kunna ändras av avdelningen som använder den. Men med bibehållen struktur. I inställningar kan enkelt nya ”snabbknappar” läggas till, operationer och sängnummer kan ändras. Färger för text och VPL ikonerna kan ändras utifrån verksamhetens behov.</p>
+			<p>Vidare kan avdelningen även skräddarsy översikten djupare genom att justera ”config.js”, detta kräver dock lite förförståelse av webbkodning. Här kan text skrivet på sidan ändras, snabbknappar tas bort, händelser när ikoner visas/döljs m.m. Allt för att man ska slippa ta sig in i alla separata funktioner.</p>
+			<h2>Demo</h2>
+			<p>Om du vill testa sidan och inte orkar fylla i allt kan du ladda ner en <a href="demo.txt" download>demo loggfil</a>.</p>
+			<h2>Användning</h2>
+			<p>Skapad och testad för Google Chrome. Fungerar med stor sannolikhet i de flesta webbläsare med stöd för HTML5 (ex. Safari, Firefox, men troligen inte Internet Explorer). Skaparens rekommendation är att Google Chrome används, då risk för buggar m.m. kan öka om annan webbläsare används.</p>
+			<p>"Översikt" är ett projekt som är skapat av Mattias för Framtidens Vårdavdelning. Sidan är fri att användas av vem som helst.</p>
+			<p>Däremot gäller fortfarande copyright. Du får inte kopiera kod och ändra något förutom "config". Du får inte sälja vidare kod på denna sidan.</p>
+			<p>2016&nbsp;&#169;&nbsp;Mattias Lidbeck</p>
+		</div>
+		<div id="vardplaninstallning" class="menyfast">
+			<input type="button" value="Stäng" onclick="showhide('vardplaninstallning');">
+			<span class="vardplan">
+				<p>Sökord</p>
+				<input type="text" class="dontsave" id="vardplansokord">
+				<p>Typ</p>
+				<select class="dontsave" id="vardplantyp">
+					<option value="uppgifter">Uppgift</option>
+					<option value="kontroller">Kontroll</option>
+				</select>
+				<p>Meddelande</p>
+				<input type="text" class="dontsave" id="vardplanmeddelande">
+				<p>Datum</p>
+				<input type="checkbox" class="dontsave" id="vardplanomdatum" onclick="vardplandate(this);"><label> Ska datum automatiskt läggas in?</label><br/>
+				<span class="vardplandate">
+					<p>Antal dagar efter operation</p>
+					<input type="number" class="dontsave" id="vardplanantaldagar"><br/>
+				</span>
+				<input type="button" value="Lägg till" onclick="laggtillnyvardplan();">
+			</span>
+			<span id="vardplanlist"></span>
+		</div>
+		<div id="installningar" class="menytopright">
+			<h2>Inställningar</h2>
+			<input type="button" value="Text" class="installningunderbutton" onclick="openundermeny('installningartext');">
+			<span id="installningartext" class="installningunderelement">
+				<h4>Storlek på text</h4>
+				<input type="number" name="installning|||||storlek" size="3" value="12"><label> px</label>
+				<h4>Typsnitt</h4>
+				<select name="installning|||||font" id="installningfont">
+					<option value="">Välj typsnitt</option>
+					<option value="verdana" style="font-family:verdana;">Verdana</option>
+					<option value="arial" style="font-family:arial;">Arial</option>
+					<option value="georgia" style="font-family:georgia;">Georgia</option>
+					<option value="'times new roman'" style="font-family:'times new roman';">Times New Roman</option>
+					<option value="'courier new'" style="font-family:'courier new';">Courier New</option>
+					<option value="'lucida console'" style="font-family:'lucida console';">Lucida Console</option>
+				</select>
+			</span>
+			<input type="button" value="Innehåll" class="installningunderbutton" onclick="openundermeny('installningarinnehall');">
+			<span id="installningarinnehall" class="installningunderelement">
+				<h4>Ny uppgift</h4>
+				<div id="installninguppgifter">
+					<span><input type="text" name="installning|||||uppgifter" class="installning" value=""><input type="button" onclick="nyline('uppgifter', false)" value="+"><input type="button" onclick="removeline(this)" value="-"></span>
+				</div>
+				<h4>Ny kontroll</h4>
+				<div id="installningkontroller">
+					<span><input type="text" name="installning|||||kontroller" class="installning" value=""><input type="button" onclick="nyline('kontroller', false)" value="+"><input type="button" onclick="removeline(this)" value="-"></span>
+				</div>
+				<h4>Ändra operationer</h4>
+				<textarea name="installning|||||operationer" id="installningoperationer"></textarea>
+				<h4>Ändra sängnummer</h4>
+				<textarea name="installning|||||sangar" id="installningsangar"></textarea>
+			</span>
+			<input type="button" value="Tidsintervall" class="installningunderbutton" onclick="openundermeny('installningartidintervall');">
+			<span id="installningartidintervall" class="installningunderelement">
+				<h4>Hur ofta datum ska kollas</h4>
+				<input type="number" id="timeinhourswhenwatchupdate" name="installning|||||timeinhourswhenwatchupdate" value=""><label> min</label>
+				<h4>Hur ofta loggfiler ska sparas</h4>
+				<input type="number" id="timeinhourstosavelogg" name="installning|||||timeinhourstosavelogg" value=""><label> min</label>
+				<h4>Antal poster i historik</h4>
+				<input type="number" id="maxelementinhistory" name="installning|||||maxelementinhistory" value=""><label> st</label>
+			</span>
+			<input type="button" value="Färger" class="installningunderbutton" onclick="openundermeny('installningarfarger');">
+			<span id="installningarfarger" class="installningunderelement">
+				<h4>Vårdplanerings ikon</h4>
+				<input type="color" name="installning|||||vplcolor[0]" value="#FFFFFF"><label> Inte inskriven</label><br/>
+				<input type="color" name="installning|||||vplcolor[1]" value="#FFFFFF"><label> Inskriven i KLARA/SVPL</label><br/>
+				<input type="color" name="installning|||||vplcolor[2]" value="#FFFFFF"><label> VPL planeras</label><br/>
+				<input type="color" name="installning|||||vplcolor[3]" value="#FFFFFF"><label> Utskrivningsklar</label>
+				<h4>Markerad uppgift/kontroll</h4>
+				<input type="color" name="installning|||||duetodaystyle" value="#FFFFFF"><label> Idag</label><br/>
+				<input type="color" name="installning|||||overduestyle" value="#FFFFFF"><label> Försenad</label><br/>
+				<input type="color" name="installning|||||dueandoverduestyle" value="#FFFFFF"><label> Text</label>
+			</span>
+			<h4>Fullskärm</h4>
+			<p>Klicka på tangenten "F11"</p>
+			<br/>
+			<input type="button" class="sparabutton" value="Spara" onclick="sparainstallningar()">
+		</div>
+	</body>
+	<script>
+			//Tar server id enbart för att koppla till socket
+			var geturl = window.location.href.replace('http://', '').split('/')[0];
+			//Lyssnar om server säger något
+			var socket = io.connect(geturl);
+
+			if(!sessionStorage.getItem('user')){
+				// The visitor is asked for their username...
+				var username = prompt('What\'s your username?');
+				if(!username){
+					//socket.emit('user', 'Åskådare');
+					//readonly();
+				}else{
+					socket.emit('user', username);
+					sessionStorage.setItem('user', username);
+				};
+			}else{
+				socket.emit('user', sessionStorage.getItem('user'));
+			};
+
+			// A dialog box is displayed when the server sends us a "message"
+			socket.on('message', function(message) {
+				console.log(message);
+				if(!sessionStorage.getItem('disconnect')){
+
+				}else{
+					sessionStorage.removeItem('disconnect')
+					location.reload();
+				};
+				/*read();*/
+			});
+			//Lägger till infomration till önskad textarea
+			socket.on('textarea', function(message) {
+				/*console.log(message.id);
+				console.log(message.info);
+				console.log(message.type);*/
+				if(message.id.split('|||||')[1] == 'medicinskbedomnstatus'){
+					var wrapper = document.getElementById('tableroom' + message.id.split('|||||')[0]).getElementsByClassName('roomnumber')[0];
+						wrapper.setAttribute('class', message.info);
+				}else if(message.id.split('|||||')[1] == 'medicinskbedomn'){
+					console.log(message.info);
+					if(message.info == 'true'){
+						var wrapper = document.getElementById('tableroom' + message.id.split('|||||')[0]).getElementsByClassName('roomnumber')[0];
+							wrapper.setAttribute('style', config.medicinskbedomningknapp.style);
+					};
+				}else if(message.id.split('|||||')[1] == 'edit'){
+					var alledit = document.getElementById('patblad' + message.id.split('|||||')[0]).getElementsByClassName('edit');
+					for (var i = alledit.length - 1; i >= 0; i--) {
+						alledit[i].innerHTML = message.info.split('|||||')[i];
+					};
+				}else if(message.id.split('|||||')[1] == 'kontroller'){
+					var wrapper = document.getElementsByName(message.id)[0]
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var historysplitted = message.info.split('||||||||||');
+					for(a=1;a<historysplitted.length;a++){
+						var info = historysplitted[a].split('|||||')
+						var roomnumber = message.id.split('|||||');
+						if(info[1] == 0){var listyle = '';}else{var listyle = info[1];}
+						if(info[2] == 0){var pstyle = '';}else{var pstyle = info[2];}
+						laggtill(roomnumber[0], info[0], roomnumber[1], 'load', listyle, pstyle);
+					};
+					checkallwatch();
+				}else if(message.id.split('|||||')[1] == 'uppgifter'){
+					var wrapper = document.getElementsByName(message.id)[0]
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var historysplitted = message.info.split('||||||||||');
+					for(a=1;a<historysplitted.length;a++){
+						var info = historysplitted[a].split('|||||')
+						var roomnumber = message.id.split('|||||');
+						if(info[1] == 0){var listyle = '';}else{var listyle = info[1];}
+						if(info[2] == 0){var pstyle = '';}else{var pstyle = info[2];}
+						laggtill(roomnumber[0], info[0], roomnumber[1], 'load', listyle, pstyle);
+					};
+					checkallwatch();
+				}else if(message.id.split('|||||')[1] == 'aktuellt'){
+					document.getElementsByName(message.id)[0].innerHTML = message.info;
+				}else if(message.id == 'historia'){
+					//Lägg in historia text någonstans! :D
+
+				}else if(message.id.split('|||||')[0] == 'icotext'){
+					//Ser om obstext finns
+					var wrapper = document.getElementById('icotext' + message.id.split('|||||')[1]);
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var allobstext = message.info.split('|||||').reverse();
+					for (var i = allobstext.length - 1; i >= 0; i--) {
+						if(allobstext[i] == ""){}else{
+							var ny = document.createElement('p');
+								ny.setAttribute('onclick', 'doubleclick("", "removeobstext", this)');
+								var nytext = document.createTextNode(allobstext[i]);
+								ny.appendChild(nytext);
+							wrapper.appendChild(ny);
+						};
+					};
+						
+				}else if(message.id.split('|||||')[0] == 'ico'){
+					//Kontrollerar ifall information är för ico
+					//Visar ikon och lägger till title
+					var idinfo = message.id.split('|||||');
+					//idinfo[0] = ico
+					//idinfo[1] = nummer
+					//idinfo[2] = namn
+					//message.info.split('|||||')[1] = titel
+
+
+
+					var allmeny = document.getElementById('menuicons' + idinfo[1]).getElementsByTagName('img');
+					for (var i = allmeny.length - 1; i >= 0; i--) {
+						if(allmeny[i].getAttribute('data') == idinfo[2]){
+							allmeny[i].setAttribute('class', '');
+							allmeny[i].setAttribute('onclick', 'removeicon(this);');
+						};
+					};
+					console.log(message.info.split('|||||'));
+					var wrapper = document.getElementById('tableroom' + idinfo[1]).getElementsByClassName('obsicon')[0];
+					var tableimg = wrapper.getElementsByClassName(idinfo[2])[0];
+						tableimg.setAttribute('class', message.info.split('|||||')[0]);
+						tableimg.setAttribute('title', message.info.split('|||||')[1]);
+						tableimg.removeAttribute('style');
+					var imagetitle = tableimg.parentElement.getElementsByClassName('tooltiptext')[0];
+						imagetitle.innerText = message.info.split('|||||')[1];
+
+					checkallwatch();
+
+
+
+
+				}else if(message.id.split('|||||')[1] == 'color'){
+					var allcolorelements = document.getElementById('tableroom' + message.id.split('|||||')[0]).getElementsByClassName('color');
+					for (var i = allcolorelements.length - 1; i >= 0; i--) {
+						if(message.info.split('|||||')[i] == 1){
+							var thecolor = allcolorelements[i].getAttribute('data');
+							allcolorelements[i].setAttribute('style', 'background-color: ' + thecolor + '; color: ' + thecolor + ';');
+						}else{
+							allcolorelements[i].removeAttribute('style');
+						};
+					};
+				}else if(message.id.split('|||||')[1] == 'svalter'){
+					if(message.info == true){
+						doljnutrition('load', message.id.split('|||||')[0], 'none', 'none', 'none', 'none');
+					}else{
+						visanutrition('load', message.id.split('|||||')[0], 'none', 'none', 'none', 'none');
+					};
+				}else{
+					//Kontrollerar typ av målelement
+					var elementtype = document.getElementsByName(message.id)[0].tagName.toLowerCase();
+					if(elementtype == 'textarea'){
+						document.getElementsByName(message.id)[0].value = message.info;
+						addgray(document.getElementsByName(message.id)[0])
+					}else if(elementtype == 'input'){
+						document.getElementsByName(message.id)[0].value = message.info;
+						addgray(document.getElementsByName(message.id)[0])
+					}else if(elementtype == 'select'){
+						document.getElementsByName(message.id)[0].value = message.info;
+						addgray(document.getElementsByName(message.id)[0])
+					}else if(elementtype == 'img'){
+						//Kontrollerar ifall det är gender eller vpl
+						if(message.id.split('|||||')[1] == 'gender'){
+							//Utifrån vilken siffra som är 1 eller nolla markeras den
+							//document.getElementsByName(message.id)[0].value = message.info;
+							var img = document.getElementsByName(message.id);
+							if(message.info.split('-')[0] == 1){
+								console.log('##Det är en man');
+								img[0].removeAttribute('class');
+							}else{
+								img[0].setAttribute('class', 'genderimage');
+							};
+
+							if(message.info.split('-')[1] == 1){
+								console.log('##Det är en kvinna');
+								img[1].removeAttribute('class');
+							}else{
+								img[1].setAttribute('class', 'genderimage');
+							};
+
+						}else if(message.id.split('|||||')[1] == 'vplimg'){
+							//VPL bild ändrar till rätt färg
+							var img = document.getElementsByName(message.id)[0]
+								img.setAttribute('src', config.vpllink[0] + message.info + config.vpllink[1]);
+								img.setAttribute('onclick', 'changevplstatus(' + message.info + ', this);');
+								img.setAttribute('style', 'background-color: ' + config.vplcolor[parseInt(message.info) - 1] + ';');
+						}else{
+							console.log('Bild med id: "' + message.id + '", kunde inte hittas.');
+						};
+					}else{
+						//Om inget av oven räknas det som ett html element
+						//Kollar vilken typ
+					};
+				};
+			});
+			socket.on('removeinfo', function(message) {
+				var idinfo = message.split('|||||');
+				//idinfo[0] = ico
+				//idinfo[1] = nummer
+				//idinfo[2] = namn
+				//message.info.split('|||||')[1] = titel
+
+				if(message.split('|||||')[1] == 'medicinskbedomnstatus'){
+					console.log(message);
+					var wrapper = document.getElementById('tableroom' + message.split('|||||')[0]).getElementsByClassName('roomnumber')[0];
+						wrapper.setAttribute('class', 'roomnumber');
+				}else if(message.split('|||||')[1] == 'medicinskbedomn'){
+					console.log(message);
+					var wrapper = document.getElementById('tableroom' + message.split('|||||')[0]).getElementsByClassName('roomnumber')[0];
+						wrapper.removeAttribute('style');
+				}else if(message.split('|||||')[1] == 'svalter'){
+					visanutrition('load', message.split('|||||')[0], 'none', 'none', 'none', 'none');
+				}else if(idinfo[0] == 'ico'){
+					var allmeny = document.getElementById('menuicons' + idinfo[1]).getElementsByTagName('img');
+					for (var i = allmeny.length - 1; i >= 0; i--) {
+						if(allmeny[i].getAttribute('data') == idinfo[2]){
+							console.log(idinfo[2] + ' hittades.')
+							allmeny[i].setAttribute('class', 'notactive');
+							allmeny[i].setAttribute('onclick', 'addicon(this);');
+						};
+					};
+					var wrapper = document.getElementById('tableroom' + idinfo[1]).getElementsByClassName('obsicon')[0];
+					var tableimg = wrapper.getElementsByClassName(idinfo[2])[0];
+						tableimg.setAttribute('class', idinfo[2] + ' notactive');
+				}else if(idinfo[0] == 'icotext'){
+					var wrapper = document.getElementById('icotext' + idinfo[1]);
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+				};
+			});
+			//Om inte användare är godkänd får den en alert...
+			socket.on('connectioninfo', function(message) {
+				alert(message);
+			});
+			//Funktion som skickar förändad text till servern
+			function synctext(element) {
+				if(!element.value){
+					socket.emit('textarea', {id: element.getAttribute('name'), info: element.innerHTML, type: 'html'});
+				}else{
+					socket.emit('textarea', {id: element.getAttribute('name'), info: element.value, type: 'text'});	
+				};
+			};
+			/*function synchtml(element){
+				socket.emit('textarea', {id: element.getAttribute('name'), info: element.innerHTML, type: 'html'});
+			};*/
+			socket.on('readonly', function(message) {
+				readonly();
+			});
+			function readonly(){
+				sessionStorage.setItem('disconnect', 'true');
+				var allinputtypes = ['textarea', 'input', 'select'];
+				for (var a = allinputtypes.length - 1; a >= 0; a--) {
+					var allinput = document.getElementsByTagName(allinputtypes[a]);
+					for (var i = allinput.length - 1; i >= 0; i--) {
+						allinput[i].removeAttribute('onkeyup');
+						allinput[i].setAttribute('readonly', 'true');
+						allinput[i].setAttribute('disabled', 'true');
+						allinput[i].setAttribute('style', 'background-color: lightgray;color: #000;')
+					};
+				};
+				var alleditable = document.getElementsByClassName('editable');
+				for (var i = alleditable.length - 1; i >= 0; i--) {
+					alleditable[i].removeAttribute('contenteditable');
+					alleditable[i].removeAttribute('onkeyup');
+					allinput[i].setAttribute('style', 'background-color: lightgray;color: #000;')
+				};
+				var elementsarray = ['td', 'li', 'img'];
+				for (var a = elementsarray.length - 1; a >= 0; a--) {
+					var alltd = document.getElementsByTagName(elementsarray[a]);
+					for (var i = alltd.length - 1; i >= 0; i--) {
+						alltd[i].removeAttribute('onclick');
+						alltd[i].removeAttribute('onkeyup');
+						alltd[i].removeAttribute('onkeydown');
+						alltd[i].removeAttribute('onmouseup');
+						alltd[i].removeAttribute('onmousedown');
+						alltd[i].removeAttribute('ontouchstart');
+						alltd[i].removeAttribute('ontouchstop');
+					};
+				};
+			};
+			//Om anslutning försvinner till server
+			socket.on('disconnect', function () {
+				//alert('Koppling till server ligger nere!');
+				readonly();
+			});
+			//Skickar kommando till server att spara all information
+			function saveall(){
+				socket.emit('saveall', '');
+			};
+		</script>
+	<datalist id="kost"></datalist>
+	<datalist id="op"></datalist>
+	<datalist id="opextra"></datalist>
+</html>

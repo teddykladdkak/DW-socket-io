@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DW-Add</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<meta content="yes" name="mobile-web-app-capable" />
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="shortcut icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/vnd.microsoft.icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/png" href="filer/icons/icon196x196.png" />
+	<link rel="apple-touch-icon-precomposed" href="filer/icons/icon180x180.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="filer/icons/icon76x76.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="filer/icons/icon120x120.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="filer/icons/icon152x152.png.png">
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="application/javascript" src="filer/config.js"></script>
+	<style type="text/css">
+		body{
+			margin:0px;
+			padding:0px;
+		}
+		table{
+			width: 100%;
+			height: 59px;
+			border-collapse: collapse;
+		}
+		td{
+			border: solid 3px #000;
+		}
+		input, select, textarea{
+			zoom:2;
+			margin-bottom: 10px;
+		}
+		input[type=button], input[type=text],input[type=number],input[type=date], select, textarea{
+			width: 98%;
+		}
+		p{
+			margin:10px 0px 0px 0px;
+			font-size: 20px;
+		}
+		#kon img, #ico img{
+			opacity: 0.5;
+		}
+		#kon img.chosen, #ico img.chosen{
+			opacity: 1;
+		}
+	</style>
+	<script type="text/javascript">
+		function addelements(){
+			var datalisttoadd = [{configid: 'ingrepp', elementid: 'optyp'}, {configid: 'ingreppextra', elementid: 'opextra'}, {configid: 'kost', elementid: 'kost'}]
+			for (var i = datalisttoadd.length - 1; i >= 0; i--) {
+				
+				var datalist = document.getElementById(datalisttoadd[i].elementid);
+				var configinfo = config[datalisttoadd[i].configid].reverse();
+				for (var y = configinfo.length - 1; y >= 0; y--) {
+					var option = document.createElement('option');
+						option.setAttribute('value', configinfo[y]);
+					datalist.appendChild(option);
+				};
+			};
+			var genderwrapper = document.getElementById('kon');
+			var kon = ['kvinna', 'man'];
+			for (var i = kon.length - 1; i >= 0; i--) {
+				var konimg = document.createElement('img');
+					konimg.setAttribute('src', config.genderlink[0] + kon[i] + config.genderlink[1]);
+					konimg.setAttribute('onclick', 'chosegeder(this);');
+					konimg.setAttribute('name', 'gender');
+				genderwrapper.appendChild(konimg);
+			};
+			var selecttransport = document.getElementById('transport');
+			for (var i = config.hemtransport.length - 1; i >= 0; i--) {
+				var optiontransport = document.createElement('option');
+					optiontransport.setAttribute('value', config.hemtransport[i]);
+					var optiontransporttext = document.createTextNode(config.hemtransport[i]);
+					optiontransport.appendChild(optiontransporttext);
+				selecttransport.appendChild(optiontransport);
+			};
+			var tabletr = document.getElementById('vårdgrupper');
+			for (var i = config.extrafarger.length - 1; i >= 0; i--) {
+				var td = document.createElement('td');
+					td.setAttribute('data-color', config.extrafarger[i]);
+					td.setAttribute('onclick', 'setcolor(this);');
+				tabletr.appendChild(td);
+			};
+			var rumnummer = document.getElementById('rumnummer');
+			config.roomnumbers.reverse();
+			for (var i = config.roomnumbers.length - 1; i >= 0; i--) {
+				var optionrum = document.createElement('option');
+					optionrum.setAttribute('value', config.roomnumbers[i]);
+					var optionrumtext = document.createTextNode(config.roomnumbers[i]);
+					optionrum.appendChild(optionrumtext);
+				rumnummer.appendChild(optionrum);
+			};
+		};
+		function setcolor(element){
+			if(!element.getAttribute('style')){
+				element.setAttribute('style', 'background-color: ' + element.getAttribute('data-color') + ';');
+			}else{
+				element.removeAttribute('style');
+			};
+		};
+		function chosegeder(element){
+			if(element.getAttribute('class')){
+				element.removeAttribute('class');
+			}else{
+				var genderimages = document.getElementById('kon').getElementsByTagName('img');
+				for (var i = genderimages.length - 1; i >= 0; i--) {
+					genderimages[i].removeAttribute('class');
+				};
+				element.setAttribute('class', 'chosen');
+			};
+		};
+		function vplstatus(element){
+			var number = element.getAttribute('data-number');
+			if(number == 4){
+				var number = 0;
+			};
+			var nynummer = parseInt(number) + 1;
+			element.setAttribute('src', config.vpllink[0] + nynummer + config.vpllink[1]);
+			element.setAttribute('data-number', nynummer);
+			element.setAttribute('style', 'background-color: ' + config.vplcolor[nynummer-1] + ';');
+		}
+		function sendinfo(){
+			var namn = document.getElementsByName('namn')[0].value;
+			var alder = document.getElementsByName('alder')[0].value;
+			var gender = document.getElementsByName('gender');
+				if(gender[0].getAttribute('class') == 'chosen'){var m = 1;}else{var m = 0;};
+				if(gender[1].getAttribute('class') == 'chosen'){var k = 1;}else{var k = 0;};
+			var opdate = document.getElementsByName('opdate')[0].value;
+			var optext = document.getElementsByName('optext')[0].value;
+			var opextra = document.getElementsByName('opextra')[0].value;
+			var edit0 = document.getElementsByName('edit-0')[0].value;
+			var kost = document.getElementsByName('kost')[0].value;
+			var extrakost = document.getElementsByName('extrakost')[0].value;
+			var edit2 = document.getElementsByName('edit-2')[0].value;
+			var aktuellt = document.getElementsByName('aktuellt')[0].value;
+			var color = document.getElementsByName('color')[0].getElementsByTagName('td');
+				var chosencolor = []
+				for (var i = color.length - 1; i >= 0; i--) {
+					if(!color[i].getAttribute('style')){
+						chosencolor.push('0');
+					}else{
+						chosencolor.push('1');
+					};
+				};
+				chosencolor.reverse();
+			var medicinskbedomn = document.getElementsByName('medicinskbedomn');
+			for (var i = medicinskbedomn.length - 1; i >= 0; i--) {
+				if(medicinskbedomn[i].checked == true){
+					var medicinskbedomnresult = medicinskbedomn[i].value;
+				};
+			};
+			var edit4 = document.getElementsByName('edit-4')[0].value;
+			var utdate = document.getElementsByName('utdate')[0].value;
+			var utinfo = document.getElementsByName('utinfo')[0].value;
+			var planut = document.getElementsByName('planut')[0].value;
+			var vplimg = document.getElementsByName('vplimg')[0].getAttribute('data-number');
+			var edit6 = document.getElementsByName('edit-6')[0].value;
+			var rumnummer = document.getElementById('rumnummer').value.replace(':', '-');
+			var arrattosend = [];
+			//console.log(rumnummer + '|||||namn: ' + namn);
+			//socket.emit('textarea', {id: rumnummer + '|||||namn', info: namn, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||namn', info: namn});
+			//console.log(rumnummer + '|||||alder: ' + alder);
+			//socket.emit('textarea', {id: rumnummer + '|||||alder', info: alder, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||alder', info: alder});
+			//console.log(rumnummer + '|||||gender: ' + m + '-' + k);
+			//socket.emit('textarea', {id: rumnummer + '|||||gender', info: m + '-' + k, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||gender', info: m + '-' + k});
+			//console.log(rumnummer + '|||||opdate: ' + opdate);
+			//socket.emit('textarea', {id: rumnummer + '|||||opdate', info: opdate, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||opdate', info: opdate});
+			//console.log(rumnummer + '|||||optext: ' + optext);
+			//socket.emit('textarea', {id: rumnummer + '|||||optext', info: optext, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||optext', info: optext});
+			//console.log(rumnummer + '|||||opextra: ' + opextra);
+			//socket.emit('textarea', {id: rumnummer + '|||||opextra', info: opextra, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||opextra', info: opextra});
+			//console.log(rumnummer + '|||||kost: ' + kost);
+			//socket.emit('textarea', {id: rumnummer + '|||||kost', info: kost, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||kost', info: kost});
+			//console.log(rumnummer + '|||||extrakost: ' + extrakost);
+			//socket.emit('textarea', {id: rumnummer + '|||||extrakost', info: extrakost, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||extrakost', info: extrakost});
+			//console.log(rumnummer + '|||||aktuellt: ' + aktuellt);
+			//socket.emit('textarea', {id: rumnummer + '|||||aktuellt', info: aktuellt, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||aktuellt', info: aktuellt});
+			var colortoadd = '';
+			chosencolor.reverse();
+			for (var i = chosencolor.length - 1; i >= 0; i--) {
+				var colortoadd = colortoadd + chosencolor[i] + '|||||';
+			};
+			//console.log(rumnummer + '|||||color: ' + colortoadd);
+			//socket.emit('textarea', {id: rumnummer + '|||||color', info: colortoadd, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||color', info: colortoadd});
+			//console.log(rumnummer + '|||||medicinskbedomn: ' + medicinskbedomnresult);
+			//socket.emit('textarea', {id: rumnummer + '|||||medicinskbedomn', info: medicinskbedomnresult, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||medicinskbedomn', info: medicinskbedomnresult});
+			//console.log(rumnummer + '|||||utdate: ' + utdate);
+			//socket.emit('textarea', {id: rumnummer + '|||||utdate', info: utdate, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||utdate', info: utdate});
+			//console.log(rumnummer + '|||||utinfo: ' + utinfo);
+			//socket.emit('textarea', {id: rumnummer + '|||||utinfo', info: utinfo, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||utinfo', info: utinfo});
+			//console.log(rumnummer + '|||||planut: ' + planut);
+			//socket.emit('textarea', {id: rumnummer + '|||||planut', info: planut, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||planut', info: planut});
+			//console.log(rumnummer + '|||||vplimg: ' + vplimg);
+			//socket.emit('textarea', {id: rumnummer + '|||||vplimg', info: vplimg, type: 'text'})
+			arrattosend.push({id: rumnummer + '|||||vplimg', info: vplimg});
+			var edit = edit0 + '||||||||||' + edit2 + '||||||||||' + edit4 + '||||||||||' + edit6 + '||||||||||';
+			//console.log(rumnummer + '|||||edit: ' + edit);
+			//socket.emit('textarea', {id: rumnummer + '|||||edit', info: edit, type: 'text'});
+			arrattosend.push({id: rumnummer + '|||||edit', info: edit});
+			console.log(arrattosend);
+			socket.emit('newpatient', arrattosend);
+			location.reload();
+		};
+	</script>
+</head>
+<body onload="addelements();">
+<div id="login">
+	<input type="text" id="loginname" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="checkkey(event)"><br/><br/>
+	<input type="button" value="Logga in" onclick="login();">
+</div>
+<div id="wrapper" style="display: none;">
+	<h1>Patientinfo</h1>
+	<p>Namn</p>
+	<input type="text" name="namn">
+	<p>Ålder</p>
+	<input type="number" name="alder">
+	<p>Kön</p>
+	<div id="kon"></div>
+	<h1>Situation</h1>
+	<p>Operations datum</p>
+	<input type="date" name="opdate">
+	<p>Operationstyp</p>
+	<input type="text" name="optext" list="optyp">
+	<p>Operation extra info</p>
+	<input type="text" name="opextra" list="opextra">
+	<p>Extra info situation (Går till SBAR)</p>
+	<textarea name="edit-0"></textarea>
+
+	<h1>Bakgrund</h1>
+	<p>Kost</p>
+	<input type="text" name="kost" list="kost">
+	<p>Kost extra info</p>
+	<textarea name="extrakost"></textarea>
+	<p>Extra info bakgrund (Går till SBAR)</p>
+	<textarea name="edit-2"></textarea>
+
+	<h1>Aktuellt</h1>
+	<p>Aktuellt</p>
+	<textarea name="aktuellt"></textarea>
+	<p>Inkopplad till</p>
+	<table><tr id="vårdgrupper" name="color"></tr></table>
+	<p>Behov av medicinsk bedömning?</p>
+	<input type="radio" value="true" name="medicinskbedomn"> Ja | <input type="radio" value="false" name="medicinskbedomn" checked> Nej
+	<p>Extra info aktuellt (Går till SBAR)</p>
+	<textarea name="edit-4"></textarea>
+
+	<h1>Rekomendation</h1>
+	<p>Planerat utskrivningsdatum</p>
+	<input type="date" name="utdate">
+	<p>Utskrivnings info</p>
+	<textarea name="utinfo"></textarea>
+	<p>Sätt att ta sig hem</p>
+	<select id="transport" name="planut"><option value=""></option></select>
+	<p>Vårdplanerings status</p>
+	<img src="filer/vpl/1.png" data-number="1" name="vplimg" onclick="vplstatus(this);">
+	<p>Extra info rekomendation (Går till SBAR)</p>
+	<textarea name="edit-6"></textarea>
+	<br/><br/>
+	<p>Sängnummer där patientdata ska klistras in</p>
+	<select id="rumnummer"></select><br/>
+	<input type="button" value="Skicka information" onclick="sendinfo();" name="">
+</div>
+<script type="text/javascript">
+	//Tar server id enbart för att koppla till socket
+	var geturl = window.location.href.replace('http://', '').split('/')[0];
+	//Lyssnar om server säger något
+	var socket = io.connect(geturl);
+	//Om inte användare är godkänd får den en alert...
+	socket.on('connectioninfo', function(message) {
+		showlogin();
+	});
+	//Om anslutning försvinner till server
+	socket.on('disconnect', function () {
+		showlogin();
+	});
+	//Om användare inte får redigera
+	socket.on('readonly', function(message) {
+		showlogin();
+	});
+	function showlogin() {
+		location.reload();
+	};
+	function hidelogin() {
+		document.getElementById('login').style.display = 'none';
+		document.getElementById('wrapper').style.display = 'block';
+	};
+	function login() {
+		var username = document.getElementById('loginname').value;
+		if(username.length == 0){
+			return false;
+		}else{
+			socket.emit('user', username);
+			hidelogin();
+		};
+	};
+	function checkkey(e){
+		if (event.which == 13 || event.keyCode == 13) {
+			login();
+			document.getElementById('loginname').blur();
+		};
+	};
+</script>
+</body>
+<datalist id="optyp"></datalist>
+<datalist id="kost"></datalist>
+<datalist id="opextra"></datalist>
+</html>

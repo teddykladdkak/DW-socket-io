@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DW-TODO</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<meta content="yes" name="mobile-web-app-capable" />
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" name="viewport" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="shortcut icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/vnd.microsoft.icon" href="filer/icons/icon.ico" />
+	<link rel="icon" type="image/png" href="filer/icons/icon196x196.png" />
+	<link rel="apple-touch-icon-precomposed" href="filer/icons/icon180x180.png"/>
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="filer/icons/icon76x76.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="filer/icons/icon120x120.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="filer/icons/icon152x152.png.png">
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="application/javascript" src="filer/config.js"></script>
+	<script type="text/javascript">
+		function onload(){
+			var head = document.getElementsByTagName('head')[0];
+				var style = document.createElement('style');
+					style.setAttribute('type', 'text/css');
+					var styletext = document.createTextNode('.todayinfo {display: block; background-color: ' + config.duetodaystyle + '!important; font-weight: bold;} .lateinfo {display: block; background-color: ' + config.overduestyle + '!important; font-weight: bold;}');
+					style.appendChild(styletext);
+				head.appendChild(style);
+			var wrapper = document.getElementById('wrapper');
+			var selectny = document.getElementById('nyrooms');
+			var nummer = config.roomnumbers.reverse();
+			for (var i = nummer.length - 1; i >= 0; i--) {
+				var option = document.createElement('option');
+					option.setAttribute('value', nummer[i].replace(':', '-'));
+					option.setAttribute('id', 'optionny' + nummer[i].replace(':', '-'));
+					var optiontext = document.createTextNode(nummer[i]);
+					option.appendChild(optiontext);
+				selectny.appendChild(option);
+				var sangnr = document.createElement('span');
+					sangnr.setAttribute('class', 'sangnr' + nummer[i].replace(':', '-'));
+					var head = document.createElement('div');
+						head.setAttribute('class', 'head');
+						head.setAttribute('onclick', 'showpat(this);')
+						var table = document.createElement('table');
+							var tr = document.createElement('tr');
+								var nr = document.createElement('td');
+									nr.setAttribute('class', 'nr');
+									var nrtext = document.createTextNode(nummer[i]);
+									nr.appendChild(nrtext);
+								tr.appendChild(nr);
+								var namn = document.createElement('td');
+									namn.setAttribute('class', 'namn');
+								tr.appendChild(namn);
+								var obs = document.createElement('td');
+									obs.setAttribute('class', 'obs');
+									obs.setAttribute('style', 'display: none;')
+									var obstext = document.createTextNode('!');
+									obs.appendChild(obstext);
+								tr.appendChild(obs);
+								var antaltodo = document.createElement('td');
+									antaltodo.setAttribute('class', 'antaltodo');
+								tr.appendChild(antaltodo);
+							table.appendChild(tr);
+						head.appendChild(table);
+					sangnr.appendChild(head);
+					var todowrapper = document.createElement('span');
+						todowrapper.setAttribute('class', 'todowrapper');
+						todowrapper.setAttribute('style', 'display: none;');
+						var uppgifter = document.createElement('span');
+							uppgifter.setAttribute('class', 'uppgifter');
+						todowrapper.appendChild(uppgifter);
+						var kontroller = document.createElement('span');
+							kontroller.setAttribute('class', 'kontroller');
+						todowrapper.appendChild(kontroller);
+					sangnr.appendChild(todowrapper);
+				wrapper.appendChild(sangnr);
+			};
+			document.getElementById('loginname').focus();
+			counttodo();
+		};
+		function showpat(element) {
+			var elementtodo = element.parentElement.getElementsByClassName('todowrapper')[0];
+			if(elementtodo.style.display == 'none'){
+				var alltodo = document.getElementsByClassName('todowrapper');
+				for (var i = alltodo.length - 1; i >= 0; i--) {
+					if(alltodo[i].style.display == 'block'){
+						alltodo[i].style.display = 'none';
+					};
+				};
+				elementtodo.style.display = 'block';
+			}else{
+				elementtodo.style.display = 'none';
+			};
+		};
+		function counttodo() {
+			var alltodo = document.getElementsByClassName('todowrapper');
+			for (var i = alltodo.length - 1; i >= 0; i--) {
+				var number = alltodo[i].getElementsByTagName('div').length;
+				var wrapper = alltodo[i].parentElement.getElementsByClassName('antaltodo')[0];
+				while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var nyttnummer = document.createTextNode(number);
+					wrapper.appendChild(nyttnummer);
+			};
+		};
+		function addobs() {
+			var alltodo = document.getElementsByClassName('todowrapper');
+			for (var i = alltodo.length - 1; i >= 0; i--) {
+				var todayinfoelements = alltodo[i].getElementsByClassName('todayinfo').length;
+				var lateinfoelements = alltodo[i].getElementsByClassName('lateinfo').length;
+				var obselement = alltodo[i].parentElement.getElementsByClassName('obs')[0];
+				if(lateinfoelements >= 1){
+					obselement.setAttribute('class', 'obs lateinfo');
+					obselement.removeAttribute('style');
+				}else if(todayinfoelements >= 1){
+					obselement.setAttribute('class', 'obs todayinfo');
+					obselement.removeAttribute('style');
+				}else{
+					obselement.setAttribute('class', 'obs');
+					obselement.setAttribute('style', 'display: none;');
+				};
+			};
+		};
+		function login() {
+			var username = document.getElementById('loginname').value;
+			if(username.length == 0){
+				return false;
+			}else{
+				socket.emit('user', username);
+				hidelogin();
+			};
+		};
+		function addbuttons(element){
+			var buttonwrapper = document.getElementById('buttons');
+			while (buttonwrapper.hasChildNodes()) {buttonwrapper.removeChild(buttonwrapper.firstChild);};
+			for (var i = config[element.value].length - 1; i >= 0; i--) {
+				var button = document.createElement('input');
+					button.setAttribute('type', 'button');
+					button.setAttribute('value', config[element.value][i].namn);
+					button.setAttribute('onclick', 'addshortcut(this);');
+				buttonwrapper.appendChild(button);
+			};
+		};
+		function addshortcut(element){
+			document.getElementById('nytext').value = element.value;
+		};
+		function addnew(){
+			var text = document.getElementById('nytext');
+			var typradio = document.getElementsByName('typ');
+			var typ = false;
+			for(var i = 0; i < typradio.length; i++){
+			    if(typradio[i].checked){
+			        typ = typradio[i].value;
+			    };
+			};
+			if(!text.value){console.log('Text finns inte!');return false}else{console.log(text.value);};
+			if(typ){console.log(typ);}else{console.log('Typ är inte satt!');return false};
+			var number = document.getElementById('nyrooms');
+			var dateelement = document.getElementsByName('annatdatum')[0];
+			if(dateelement.value.length == 0){
+				var date = '';
+			}else{
+				var date = ' ' + dateelement.value;
+			};
+			console.log(number.value + '|||||' + typ + ' = ' + text.value + date);
+			var newtext = text.value + date + '|||||0|||||0';
+			var wrapper = document.getElementsByClassName('sangnr' + number.value)[0].getElementsByClassName(typ)[0];
+			addli(newtext, wrapper);
+			counttodo();
+			checkallwatch();
+			addobs();
+			save(wrapper);
+			closeedit();
+		};
+		function closeedit(){
+			var buttonwrapper = document.getElementById('buttons');
+			while (buttonwrapper.hasChildNodes()) {buttonwrapper.removeChild(buttonwrapper.firstChild);};
+			document.getElementById('nytext').value = '';
+			var typradio = document.getElementsByName('typ');
+			for(var i = 0; i < typradio.length; i++){
+				typradio[i].checked=false;
+			};
+			document.getElementsByName('annatdatum')[0].value = '';
+			document.getElementById('nyrooms').selectedIndex = "0";
+			document.getElementById('ny').setAttribute('style', 'display: none;');
+			document.getElementById('wrapper').setAttribute('style', 'display: block;');
+			document.getElementsByClassName('nyttelement')[0].setAttribute('style', 'display: block;');
+		};
+		function showedit(){
+			document.getElementById('ny').setAttribute('style', 'display: block;');
+			document.getElementById('wrapper').setAttribute('style', 'display: none;');
+			document.getElementsByClassName('nyttelement')[0].setAttribute('style', 'display: none;');
+		};
+		function checkkey(e){
+			if (event.which == 13 || event.keyCode == 13) {
+				login();
+				document.getElementById('loginname').blur();
+			};
+		};
+	</script>
+	<style type="text/css">
+		body{
+			margin: 0px;
+			padding: 0px;
+			font-family: arial;
+			margin-bottom: 60px;
+			-webkit-touch-callout: none; /* iOS Safari */
+		    -webkit-user-select: none; /* Safari */
+		     -khtml-user-select: none; /* Konqueror HTML */
+		       -moz-user-select: none; /* Firefox */
+		        -ms-user-select: none; /* Internet Explorer/Edge */
+		            user-select: none; /* Non-prefixed version, currently
+		                                  supported by Chrome and Opera */
+		}
+		.nyttelement{
+			position: fixed;
+		    right: 5px;
+		    bottom: 5px;
+			border-radius: 50px;
+			background: #73AD21;
+			padding: 0px; 
+			width: 50px;
+			height: 50px;
+			text-align: center;
+			vertical-align: middle;
+			font-size: 45px;
+			color: #FFF;
+			font-weight: bold;
+		}
+		#login, #ny {
+			text-align: center;
+			margin: 100px 0px;
+		}
+		input, select{
+			zoom: 2.0;
+		}
+		#login input{
+			width: 80%
+		}
+		#ny input[type=button]{
+			margin: 5px;
+		}
+		#ny input[type=text], #ny input[type=date], #ny select{
+			width: 80%
+		}
+		#wrapper {
+			font-size: 40px;
+		}
+		.head, .todowrapper div {
+			border: solid 3px #000;
+		}
+		.head {
+			background-color: green;
+			color: #FFF;
+		}
+		.head .namn {
+			width: 100%;
+		}
+		.head .antaltodo {
+			background-color: #FFF;
+			color: #000;
+			padding: 0px 5px;
+		}
+		.head .obs {
+			color: #000;
+			font-weight: bold;
+			padding: 0px 10px;
+		}
+		.todowrapper div:nth-child(even) {
+			background-color: lightgray;
+		}
+		.todowrapper {
+			display: none;
+		}
+		.markeddone {
+			color: gray;
+			text-decoration: line-through;
+		}
+	</style>
+</head>
+<body onload="onload();">
+	<div id="ny" style="display: none;">
+		<select id="nyrooms"></select><br/><br/>
+		<input type="radio" name="typ" value="uppgifter" onclick="addbuttons(this)"><label>Uppgifter</label><input type="radio" name="typ" value="kontroller" onclick="addbuttons(this)">Kontroller<br/><br/>
+		<div id="buttons"></div><br/><br/>
+		<input type="text" name="annat" id="nytext"><br/><br/>
+		<input type="date" name="annatdatum"><br/><br/>
+		<input type="button" value="Lägg till" onclick="addnew();"><input type="button" value="Avbryt" onclick="closeedit();"><br/><br/>
+	</div>
+	<div id="login">
+		<input type="text" id="loginname" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="checkkey(event)"><br/><br/>
+		<input type="button" value="Logga in" onclick="login();">
+	</div>
+	<div id="wrapper" style="display: none;">
+		
+	</div>
+	<div class="nyttelement" style="display: none;" onclick="showedit();">+</div>
+	<script type="text/javascript">
+		//Tar server id enbart för att koppla till socket
+		var geturl = window.location.href.replace('http://', '').split('/')[0];
+		//Lyssnar om server säger något
+		var socket = io.connect(geturl);
+		//Tar mot info från server
+		socket.on('textarea', function(message) {
+			var idsplit = message.id.split('|||||');
+			if(idsplit[1] == 'namn'){
+				var wrapper = document.getElementsByClassName('sangnr' + idsplit[0])[0].getElementsByClassName('namn')[0];
+					while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+					var namntext = document.createTextNode(message.info);
+					wrapper.appendChild(namntext);
+				var option = document.getElementById('optionny' + idsplit[0]);
+					while (option.hasChildNodes()) {option.removeChild(option.firstChild);};
+					var optiontext = document.createTextNode(idsplit[0] + ' ' + message.info);
+					option.appendChild(optiontext);
+			}else if(idsplit[1] == 'kontroller'){
+				addtolist(idsplit, message, 'kontroller');
+			}else if(idsplit[1] == 'uppgifter'){
+				addtolist(idsplit, message, 'uppgifter');
+			};
+		});
+		//Om inte användare är godkänd får den en alert...
+		socket.on('connectioninfo', function(message) {
+			showlogin();
+		});
+		//Funktion som skickar förändad text till servern
+		function synctext(element) {
+			if(!element.value){
+				socket.emit('textarea', {id: element.getAttribute('name'), info: element.innerHTML, type: 'html'});
+			}else{
+				socket.emit('textarea', {id: element.getAttribute('name'), info: element.value, type: 'text'});	
+			};
+		};
+		//Om anslutning försvinner till server
+		socket.on('disconnect', function () {
+			showlogin();
+		});
+		//Om användare inte får redigera
+		socket.on('readonly', function(message) {
+			showlogin();
+		});
+		function showlogin() {
+			location.reload();
+		};
+		function hidelogin() {
+			document.getElementById('login').style.display = 'none';
+			document.getElementById('wrapper').style.display = 'block';
+			document.getElementsByClassName('nyttelement')[0].removeAttribute('style');
+		};
+		function addli(historysplitted, wrapper){
+			var info = historysplitted.split('|||||');
+				var div = document.createElement('div');
+					div.setAttribute('ontouchstart', 'touchAvailable=true;doubleclick("markuppgift", "removeuppgift", this);');
+					div.setAttribute('onmousedown', 'if(!touchAvailable) doubleclick("markuppgift", "removeuppgift", this);');
+					if(lookfordate(info[0]) == 'none'){}else{
+						div.setAttribute('class', 'watch');
+						div.setAttribute('data-date', info[0].split(' ')[lookfordate(info[0])]);
+					}
+					if(lookfortime(info[0]) == 'none'){}else{
+						div.setAttribute('class', 'watch');
+						div.setAttribute('data-time', info[0].split(' ')[lookfortime(info[0])]);
+					};
+					var text = document.createTextNode(info[0]);
+					div.appendChild(text);
+				wrapper.appendChild(div)
+				if(info[1] == 0){}else{
+					if(!div.getAttribute('class')){}else{
+						div.setAttribute('data', div.getAttribute('class'));
+					};
+					div.setAttribute('class', 'markeddone');
+				};
+		};
+		function addtolist(idsplit, message, typ) {
+			var wrapper = document.getElementsByClassName('sangnr' + idsplit[0])[0].getElementsByClassName(typ)[0];
+			while (wrapper.hasChildNodes()) {wrapper.removeChild(wrapper.firstChild);};
+			var historysplitted = message.info.split('||||||||||');
+			for(a=1;a<historysplitted.length;a++){
+				addli(historysplitted[a], wrapper);
+			};
+			counttodo();
+			checkallwatch();
+			addobs();
+		};
+		function markuppgift(element){
+			if(element.getAttribute('class') == 'markeddone'){
+				if(!element.getAttribute('data')){
+					element.removeAttribute('class');
+				}else{
+					element.setAttribute('class', element.getAttribute('data'));
+				};
+				element.removeAttribute('data');
+			}else{
+				if(!element.getAttribute('class')){}else{
+					element.setAttribute('data', element.getAttribute('class'));
+				};
+				element.setAttribute('class', 'markeddone');
+			};
+			checkallwatch();
+			addobs();
+			save(element.parentElement);
+		};
+		function removeuppgift(element){
+			var wrapper = element.parentElement;
+			wrapper.removeChild(element);
+			save(wrapper);
+			counttodo();
+			addobs();
+		};
+		function save(element){
+			if(element.getAttribute('class') == 'uppgifter'){
+				var alldots = element.getElementsByTagName('div');
+				var tosave = '';
+				for (var i = alldots.length - 1; i >= 0; i--) {
+					if(alldots[i].getAttribute('class') == 'markeddone'){
+						var gjort = '|||||color:#bdbdbd;text-decoration:line-through;|||||background-color:#FFF!important;color:#bdbdbd;font-weight:normal;';
+					}else{
+						var gjort = '|||||0|||||0';
+					};
+					var tosave = tosave + '||||||||||' + alldots[i].innerText + gjort;
+				};
+				var nummer = element.parentElement.parentElement.getAttribute('class').replace('sangnr', '');
+				console.log(nummer + '|||||' + 'uppgifter = ' + tosave);
+				socket.emit('textarea', {"id": nummer + '|||||' + 'uppgifter', "info": tosave, "type": "text"});
+			}else if(element.getAttribute('class') == 'kontroller'){
+				var alldots = element.getElementsByTagName('div');
+				var tosave = '';
+				for (var i = alldots.length - 1; i >= 0; i--) {
+					if(alldots[i].getAttribute('class') == 'markeddone'){
+						var gjort = '|||||color:#bdbdbd;text-decoration:line-through;|||||background-color:#FFF!important;color:#bdbdbd;font-weight:normal;';
+					}else{
+						var gjort = '|||||0|||||0';
+					};
+					var tosave = tosave + '||||||||||' + alldots[i].innerText + gjort;
+				};
+				var nummer = element.parentElement.parentElement.getAttribute('class').replace('sangnr', '');
+				console.log(nummer + '|||||' + 'kontroller = ' + tosave);
+				socket.emit('textarea', {"id": nummer + '|||||' + 'kontroller', "info": tosave, "type": "text"});
+			};
+		};
+		touchAvailable = false;
+		var doubleclickklickad = false;
+		var doubleclickonetap;
+		var trippleclickklickad = false;
+		var trippleclickonetap;
+		function doubleclick(ett, tva, element) {
+		    if (window['doubleclickklickad']){
+			    clearTimeout(doubleclickonetap);
+			    window['doubleclickklickad'] = false;
+			    if (window['trippleclickklickad']){
+				    clearTimeout(trippleclickonetap);
+				    window['trippleclickklickad'] = false;
+				    //setTimeout(function(){clearTimeout(showmenydelay);hidemenu();}, config.whaitondoubleclick);
+				    window[tva](element);
+			    }else{
+				    if(!ett){
+					    trippleclickonetap = setTimeout(function(){/*clearTimeout(showmenydelay);*/ window['doubleclickklickad'] = false; window['trippleclickklickad'] = false; }, config.whaitondoubleclick);
+				    }else{
+					    trippleclickonetap = setTimeout(function(){/*clearTimeout(showmenydelay);*/ /*setTimeout(function(){hidemenu();}, config.whaitondoubleclick);*/ window[ett](element); window['doubleclickklickad'] = false; window['trippleclickklickad'] = false; }, config.whaitondoubleclick);
+				    };
+				    window['trippleclickklickad'] = true;
+				    window['doubleclickklickad'] = true;
+			    };
+		    }else{
+				doubleclickonetap = setTimeout(function(){ window['doubleclickklickad'] = false; }, config.whaitondoubleclick);
+		        window['doubleclickklickad'] = true;
+		    };
+		};
+		function lookfordate(string){
+			var lookfordate = string.split(' ');
+			var todo = 'none';
+			for(g=0;g<lookfordate.length;g++){
+				var lookfordatewords = lookfordate[g].split('-');
+				if(lookfordatewords.length == 3){
+					var year = lookfordatewords[0].replace(/[^\/\d]/g,'');
+					var month = lookfordatewords[1].replace(/[^\/\d]/g,'');
+					var day = lookfordatewords[2].replace(/[^\/\d]/g,'');
+					if(year.split('').length == 4 || year.split('').length == 2){
+						if(month.split('').length == 2){
+							if(month <= 12){
+								if(day.split('').length == 2){
+									if(day <= 32){
+										var todo = g;
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+			return todo;
+		};
+		function lookfortime(string){
+			var lookfortime = string.split(' ');
+			var todo = 'none';
+			for(g=0;g<lookfortime.length;g++){
+				var lookfortimewords = lookfortime[g].split(':');
+				if(lookfortimewords.length == 2){
+					var hour = lookfortimewords[0].replace(/[^\/\d]/g,'');
+					var min = lookfortimewords[1].replace(/[^\/\d]/g,'');
+					if(hour.split('').length == 2){
+						if(hour <= 24){
+							if(min.split('').length == 2){
+								if(min <= 59){
+									var todo = g;
+								};
+							};
+						};
+					};
+				};
+			};
+			return todo;
+		};
+		function comparetime(sattdatum, dagarframtid){
+			var watchdatum = lookfordate(sattdatum);
+			var watchtid = lookfortime(sattdatum);
+			if(watchdatum != 'none'){
+				var samestandard = sattdatum.split('-');
+				if(samestandard[0].split('').length == 2){
+					var sattdatum = '20' + sattdatum;
+				};
+				if(dagarframtid != 'none'){
+					var nuvarandedatum = nextdate(dagarframtid);
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				}else{
+					var nuvarandedatum = datum();
+						var nuvarandedatumpritty = parseInt(nuvarandedatum.replace(/[-]/g, ''));
+				};
+				var sattdatumpritty = parseInt(sattdatum.replace(/[-]/g, ''));
+				if(nuvarandedatumpritty == sattdatumpritty){
+					return 'todayinfo';
+				}else if(nuvarandedatumpritty > sattdatumpritty){
+					return 'lateinfo';
+				}else{
+					return 'none';
+				};
+			}else if(watchtid != 'none'){
+				var nuvarandetid = tid();
+					var nuvarandetidpritty = nuvarandetid.replace(':', '');
+				var satttidpritty = sattdatum.replace(':', '');
+				if(nuvarandetidpritty >= satttidpritty){
+					return 'todayinfo';
+				}else{
+					return 'none';
+				};
+			}else{
+				console.log('comparetime() har märkt att något element har troligen watch på sig utan värde att använda = har troligen taggen av misstag');
+				return 'none';
+			};
+		};
+		function tid(eventuelltid){
+			if(eventuelltid){
+				/*var d = new Date(nyyear, nymonth, nyday);*/
+				var tid = eventuelltid;
+			}else{
+				var d = new Date();
+				var h = d.getHours();
+				var m = d.getMinutes();
+				if(h <= 9){var h = '0' + h;};
+				if(m <= 9){var m = '0' + m;};
+				var tid = h + ':' + m;
+			};
+			return tid;
+		};
+		function datum(eventuelltdatum){
+			if(!eventuelltdatum){
+				var d = new Date();
+			}else{
+				var nyyear = eventuelltdatum.split('-')[0];
+				var nymonth = eventuelltdatum.split('-')[1] - 1;
+				var nyday = eventuelltdatum.split('-')[2];
+				var d = new Date(nyyear, nymonth, nyday);
+			};
+			var year = d.getFullYear();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+			if(day <= 9){var day = '0' + day;};
+			if(month <= 9){var month = '0' + month;};
+			var datetonumber = year + '-' + month + '-' + day;
+			return datetonumber;
+		};
+		function checkallwatch(){
+			var allwatch = document.getElementsByClassName('watch');
+			for (var i = allwatch.length - 1; i >= 0; i--) {
+				if(!allwatch[i].getAttribute('data-date')){
+					var date = false;
+				}else{
+					var date = comparetime(allwatch[i].getAttribute('data-date'), 'none');
+				};
+				if(!allwatch[i].getAttribute('data-time')){
+					var time = false;
+				}else{
+					var time = comparetime(allwatch[i].getAttribute('data-time'), 'none');
+				};
+
+				if(date){
+					if(time){
+						if(date == 'lateinfo'){
+							allwatch[i].setAttribute('class', 'watch ' + date);
+						}else{
+							if(date == 'none'){
+								allwatch[i].setAttribute('class', 'watch');
+							}else{
+								allwatch[i].setAttribute('class', 'watch ' + time);
+							};
+						};
+					}else{
+						allwatch[i].setAttribute('class', 'watch ' + date);
+					};
+				}else if(time){
+					allwatch[i].setAttribute('class', 'watch ' + time);
+				}else{
+					console.log('Kan inte läsa datum av någon anledning...')
+				};
+			};
+			/*
+			var allwatch = document.getElementsByClassName('watch');
+			for(i=0;i<allwatch.length;i++){
+				if(allwatch[i].getAttribute('title')){
+					var sattdatum = allwatch[i].getAttribute('title');
+					var isitaimage = true;
+				}else{
+					var sattdatum = allwatch[i].getAttribute('data');
+					var isitaimage = false;
+				};
+				if(isitaimage){
+					if(comparetime(sattdatum, 'none') != 'none'){
+						allwatch[i].setAttribute('style', 'opacity:0.2;');
+					}else if(comparetime(sattdatum, '1') != 'none'){
+						addvarning(allwatch[i]);
+					};
+				}else{
+					var morewatch = allwatch[i].parentElement.getElementsByClassName('watch');
+					if(morewatch.length == 1){
+						var checkiflate = comparetime(sattdatum, 'none');
+						if(checkiflate != 'none'){
+							allwatch[i].setAttribute('class', checkiflate);
+						};
+					}else{
+						for(m=0;m<morewatch.length;m++){
+							var checkiflate = comparetime(morewatch[m].getAttribute('data'), 'none');
+							var watchdatum = lookfordate(morewatch[m].getAttribute('data'));
+							var watchtid = lookfortime(morewatch[m].getAttribute('data'));
+							if(watchdatum != 'none'){
+								var omdatumsen = checkiflate;
+							}else if(watchtid != 'none'){
+								var omtidsen = checkiflate;
+							}else{
+								console.log('Något gick fel i bestämmande av typ tid eller datum, detta när både datum och tid existerar i text.');
+							};
+						};
+						if(omdatumsen == 'lateinfo'){
+							var stiltillparent = 'lateinfo';
+						}else if(omdatumsen == 'todayinfo'){
+							if(omtidsen == 'todayinfo'){
+								var stiltillparent = 'todayinfo';
+							}else{
+								var stiltillparent = 'none';
+							};
+						}else if(omdatumsen == 'none'){
+							var stiltillparent = 'none';
+						}else{
+							console.log('Något gick fel i utläsningen och gemförandet mellan tid och datum.');
+						};
+						if(stiltillparent != 'none'){
+							allwatch[i].setAttribute('class', stiltillparent);
+						}else{
+							allwatch[i].removeAttribute('class');
+						};
+					};
+				};
+			};*/
+		};
+	</script>
+</body>
+</html>
