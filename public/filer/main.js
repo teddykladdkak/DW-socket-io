@@ -1507,7 +1507,9 @@ function showmeny(type, number, redigera){
 		};
 		document.getElementById('iconmenu').removeAttribute('style');
 		setTimeout(function(){
-			document.getElementById('contentwrapper').setAttribute('onclick', 'hidemenu("' + type + '", "' + number + '")');
+			if(!redigera){
+				document.getElementById('contentwrapper').setAttribute('onclick', 'hidemenu("' + type + '", "' + number + '")');
+			};
 		}, 1);
 	}, config.whaitondoubleclick);
 };
