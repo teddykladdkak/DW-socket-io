@@ -1,0 +1,398 @@
+html {
+	height: 100%;
+	box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+body {
+	background-color: #000;
+	color:#FFF;
+	position: relative;
+	margin: 0;
+	padding:0px;
+	padding-bottom: 6rem;
+	min-height: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper a{
+	color:#FFF;
+	text-decoration: none;
+	border-bottom: 3px solid #fff;
+}
+#wrapper a:hover{
+	color:#000;
+	text-decoration: none;
+	border-bottom: 0px;
+	background-color: #E87600;
+}
+#wrapper a, #meny, #meny ul, .h1, #mobilemenyicon, i{
+	-webkit-transition: all 200ms linear;
+    -moz-transition: all 200ms linear;
+    -o-transition: all 200ms linear;
+    -ms-transition: all 200ms linear;
+    transition: all 200ms linear;
+}
+#header{
+	text-align: center;
+}
+.h1, .h2, .h3{
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.h1{
+	font-size: 100px;
+	display:block;
+}
+.h2{
+	background-color: #FFF;
+	color:#000;
+	padding: 5px 10px;
+	font-size: 30px;
+}
+.h3{
+	font-size: 25px;
+	display:block;
+}
+p, #content{
+	font-size: 20px;
+	margin-bottom: 10px;
+	margin-top: 0px;
+}
+#mobilemenyicon{
+	position: fixed;
+	top: 0;
+	left: 0;
+	color:#FFF;
+	font-weight: bold;
+	font-size: 25px;
+	padding:3px 5px 5px 5px;
+	background-color: #666;
+	display: none;
+	cursor: pointer;
+z-index: 13;
+}
+#meny {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background-color: #000;
+	text-transform: uppercase;
+	list-style-type: none;
+	text-align: center;
+	margin: 0px;
+	padding: 1px;
+	font-weight: bolder;
+	letter-spacing: 1px;
+	white-space: nowrap;
+	z-index: 13;
+}
+#meny ul {
+	padding:15px;
+}
+#meny ul li {
+	display: inline;
+}
+#meny ul li a {
+	border-bottom: 0px solid #000;
+	text-decoration: none;
+	color:#FFF;
+	padding:10px;
+}
+#meny ul li a:hover, #meny ul li a.active{
+	color:#FFF;
+	border-bottom: 3px solid #FFF;
+}
+#meny.floating{
+	background-color: #E87600;
+	
+}
+#meny.floating a{
+	color:#000;
+}
+#meny.floating ul li a:hover, #meny.floating ul li a.active{
+	color:#000;
+	border-bottom: 3px solid #000;
+}
+#wrapper{
+	/*margin-top: 90px;*/
+	padding-top: 90px;
+}
+#content{
+	margin-right:auto;
+	margin-left:auto;
+	max-width: 800px;
+	margin-top: 20px;
+}
+.tablecontainer{
+	display: table;
+	width:100%;
+	border-bottom: 3px solid #FFF;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+.row{
+	display: table-row;
+}
+.left, .right, .middle {
+	display: table-cell;
+	vertical-align: top;
+}
+#footer{
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	font-size:10px!important;
+	text-align: center;
+}
+#footer a{
+	color:#FFF;
+}
+#footer a:hover{
+	color: #E87600;
+	text-decoration: overline underline;
+}
+#malwrapper {
+	display: table;
+	width: 100%;
+}
+#malwrapper .malrad {
+	display: table-row;
+}
+#malwrapper .malrad .malcol {
+	display: table-cell;
+	text-align: center;
+	padding: 2px;
+}
+#malwrapper .malrad .malcol i {
+	padding-bottom: 5px;
+	font-size: 100px;
+}
+.iconbutton {
+	font-size: 60px;
+}
+.iconbutton{
+	color:#FFF!important;
+	text-decoration: none!important;
+	border-bottom: 0px!important;
+}
+.iconbutton:hover{
+	color:#E87600!important;
+	text-decoration: none!important;
+	border-bottom: 0px!important;
+	background-color: #000!important;
+}
+.ommigtable {
+	display: table;
+	width: 100%;
+}
+.ommigrow {
+	display: table-row;
+	width: 100%;
+}
+.ommigcol {
+	display: table-cell;
+	padding-top: 10px;
+	vertical-align: middle;
+}
+.kontakttable {
+	display: table;
+	width: 100%;
+}
+.kontaktline {
+	display: table-row;
+	width: 100%;
+}
+.kontaktelemwrapp {
+	display: table-cell;
+	color: #FFF;
+	text-align: center;
+}
+.kontaktelemwrapp i {
+	font-size: 150px;
+}
+.visningsbild {
+	text-align: right;
+	width: 30%;
+}
+.basinfo {
+	width: 70%;
+	padding-right: 10px;
+	padding-left: 1.5em;
+	text-indent:-1.5em;
+}
+.ommigcol img {
+	width:100%;
+}
+.ommigcol:nth-child(2) {
+	width: 100%;
+}
+.ommigplatser {
+	padding-left: 1.5em;
+	text-indent:-1.5em;
+}
+.ommigicon {
+	font-size: 100px;
+	vertical-align: middle;
+	text-align: center;
+	padding-right: 10px;
+}
+@media screen and (max-width: 900px) {
+	.h1{
+		font-size: 65px;
+		padding-top: 10px;
+		margin-bottom:5px;
+	}
+	.h2, .h3{
+		font-size: 25px;
+	}
+	p, #content{
+		font-size: 18px;
+	}
+}
+@media screen and (max-width: 730px) {
+	#wrapper{
+		/*margin-top: 40px;*/
+		padding-top: 40px;
+	}
+	#mobilemenyicon{
+		display: inline;
+	}
+	#meny{
+		display: none;
+		text-align: left;
+		background-color: #666;
+		padding-top: 25px;
+	}
+	#meny ul{
+		padding: 0px;
+		margin: 0px;
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+	#meny ul li {
+		display: block;
+		padding-top: 10px
+	}
+	#meny ul li a {
+		display: inline-block;
+		width: 100%;
+		border-bottom: 3px solid #666;
+		padding: 10px;
+	}
+	#meny ul li a:hover{
+		background-color: #E87600;
+		border-bottom: 3px solid #666;
+	}
+}
+@media screen and (max-width: 600px) {
+ 	.h1{
+		font-size: 30px;
+		margin-bottom:10px;
+	}
+	.h2, .h3{
+		font-size: 25px;
+		display: block;
+	}
+	p, #content{
+		font-size: 18px;
+	}
+	#content{
+		width:100%;
+		margin-right:0px;
+		margin-left:0px;
+	}
+	.tablecontainer{
+		display: block;
+	}
+	.row{
+		display: inline;
+	}
+	.left, .right, .middle {
+		display: block;
+		margin:0px 0px!important;
+		width:98%!important;
+	}
+	#malwrapper {
+		display: block;
+		width: 100%;
+	}
+	#malwrapper .malrad {
+		display: table;
+	}
+	#malwrapper .malrad .malcol {
+		display: table-row;
+		text-align: left;
+		padding: 2px;
+	}
+	#malwrapper .malrad .malcol i {
+		font-size: 50px;
+	}
+	#malwrapper .malrad .beskriv, #malwrapper .malrad .malicon {
+		display: table-cell;
+		vertical-align: middle;
+	}
+	.ommigicon, .ommigplatser {
+		display: block;
+		text-align: left;
+	}
+	.ommigicon {
+		font-size: 40px;
+		font-weight: bold;
+		vertical-align: middle;
+		text-align: center;
+	}
+	.ommigicon p {
+		display: inline-block;
+	}
+	.kontaktrubrik{
+		display: none;
+	}
+}
+@media screen and (max-width: 450px) {
+	.kontakttable, .kontaktline, .kontaktelemwrapp {
+		display: block;
+		text-align: left;
+	}
+	.kontaktelemwrapp p {
+		display: inline-block;
+	}
+	.kontaktelemwrapp i {
+		font-size: 30px;
+	}
+}
+a.button{
+	border:0px!important;
+	background-color: #FFF;
+	color:#000!important;
+	display:inline-block;
+	padding:15px 20px;
+	font-weight: bold;
+	cursor:pointer;
+	margin:10px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+.pw_prompt {
+    background-color:#FFF;
+    color:#000;
+    position:fixed;
+    left: 50%;
+    top:50%;
+    margin-left:-100px;
+    padding:15px;
+    width:200px;
+    border:1px solid black;
+}
+.pw_prompt label {
+    display:block; 
+    margin-bottom:5px;
+}
+.pw_prompt input {
+    margin-bottom:10px;
+}
