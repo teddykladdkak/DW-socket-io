@@ -95,7 +95,7 @@
 			return tr;
 		}
 		//Tar server id enbart för att koppla till socket
-		var geturl = window.location.href.replace('http://', '').split('/')[0];
+		var geturl = window.location.href.replace('http://', '').replace('https://', '').split('/')[0];
 		//Lyssnar om server säger något
 		var socket = io.connect(geturl);
 		socket.on('adminsparad', function(message) {
