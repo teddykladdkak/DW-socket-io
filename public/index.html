@@ -30,43 +30,6 @@
 			var wrapper = document.getElementById('content');
 			config.cmd.versioner.reverse();
 			for (var i = config.cmd.versioner.length - 1; i >= 0; i--) {
-			/*
-				config.cmd.versioner[i]
-				var head = document.createElement('h3');
-					var headtext = document.createTextNode(config.cmd.versioner[i].namn);
-					head.appendChild(headtext);
-				wrapper.appendChild(head);
-				var link = document.createElement('a');
-					link.setAttribute('href', config.cmd.versioner[i].lank);
-					var linktext = document.createTextNode(document.location.href + config.cmd.versioner[i].lank.replace('/', ''));
-					link.appendChild(linktext);
-				wrapper.appendChild(link);
-				var beskrivning = document.createElement('p');
-					var beskrivningtext = document.createTextNode(config.cmd.versioner[i].beskrivning);
-					beskrivning.appendChild(beskrivningtext);
-				wrapper.appendChild(beskrivning);
-			*/
-			/*
-
-			<div class="tablecontainer information">
-				<div class="row">
-					<div class="left previewimg" style="background-image: url('img/preview/patinfo.jpg');background-position: center;">
-						<img src="img/qr?name=http://www.patinfo.tk" class="qr-image" width="150px"></div>
-							<div class="right descript">
-								<span class="h3">
-									InfoSida
-								</span>
-								<img src="img/preview/patinfo.jpg" class="previewbild">
-								<p>
-									Projekt som utmanar möjligheterna att digitalisera informationsfoldern från avdelningar och hur man ska kunna skapa en API vilket gör det enklare för verksamheten att göra justeringar.</p><p>Fokus har även lagts ner på att göra informations sidan tillgängling.
-								</p>
-								<a href="http://www.patinfo.tk" class="button">Till Sidan</a>
-								<a href="https://github.com/teddykladdkak/InfoSida" class="button">GitHub</a>
-							</div>
-						</div>
-					</div>
-
-			*/
 				var container = document.createElement('div');
 					container.setAttribute('class', 'tablecontainer information');
 					var row = document.createElement('div');
@@ -113,9 +76,9 @@
 		<span class="h2">Digital Whiteboard Server</span>
 	</div>
 	<div id="content">
-		<!-- <div class="tablecontainer">
+		<div class="tablecontainer">
 			<p>Login namn att använda: "olle", "kajsa", "erik", "ylva", "test".</p>
-		</div> -->
+		</div>
 	</div>
 </div>
 <div id="footer"><span id="logg">[]</span>&nbsp;¦&nbsp;2016&nbsp;©&nbsp;Mattias Lidbeck&nbsp;¦&nbsp;{<a href="http://www.teddyprojekt.tk/" target="blank" alt="Länk till denna sida">www.teddyprojekt.tk</a>}</div>
