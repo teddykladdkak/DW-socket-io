@@ -64,25 +64,34 @@
 					beskrivning.appendChild(beskrivningtext);
 				wrapper.appendChild(beskrivning);
 			*/
+			/*
+
+			<div class="tablecontainer information">
+				<div class="row">
+					<div class="left previewimg" style="background-image: url('img/preview/patinfo.jpg');background-position: center;">
+						<img src="img/qr?name=http://www.patinfo.tk" class="qr-image" width="150px"></div>
+							<div class="right descript">
+								<span class="h3">
+									InfoSida
+								</span>
+								<img src="img/preview/patinfo.jpg" class="previewbild">
+								<p>
+									Projekt som utmanar möjligheterna att digitalisera informationsfoldern från avdelningar och hur man ska kunna skapa en API vilket gör det enklare för verksamheten att göra justeringar.</p><p>Fokus har även lagts ner på att göra informations sidan tillgängling.
+								</p>
+								<a href="http://www.patinfo.tk" class="button">Till Sidan</a>
+								<a href="https://github.com/teddykladdkak/InfoSida" class="button">GitHub</a>
+							</div>
+						</div>
+					</div>
+
+			*/
 				var container = document.createElement('div');
 					container.setAttribute('class', 'tablecontainer information');
 					var row = document.createElement('div');
 						row.setAttribute('class', 'row');
 						var leftcol = document.createElement('div');
-							leftcol.setAttribute('class', 'left');
-							var previewimg = document.createElement('img');
-								previewimg.setAttribute('src', 'filer/preview/' + config.cmd.versioner[i].img);
-								previewimg.setAttribute('width', '90%');
-							leftcol.appendChild(previewimg);
-							var brake = document.createElement('br')
-							leftcol.appendChild(brake);
-							var button = document.createElement('a');
-								button.setAttribute('href', config.cmd.versioner[i].lank);
-								button.setAttribute('class', 'button');
-								button.setAttribute('target', '_blank');
-								var buttontext = document.createTextNode('Till sidan');
-								button.appendChild(buttontext);
-							leftcol.appendChild(button);
+							leftcol.setAttribute('class', 'left previewimg');
+							leftcol.setAttribute('style', 'background-image: url(\'filer/preview/' + config.cmd.versioner[i].img + '\');background-position: center;');
 						row.appendChild(leftcol);
 						var rightcol = document.createElement('div');
 							rightcol.setAttribute('class', 'right');
@@ -91,10 +100,21 @@
 								var headtext = document.createTextNode(config.cmd.versioner[i].namn);
 								head.appendChild(headtext);
 							rightcol.appendChild(head);
+							var previewimg = document.createElement('img');
+								previewimg.setAttribute('src', 'filer/preview/' + config.cmd.versioner[i].img);
+								previewimg.setAttribute('class', 'previewbild');
+							rightcol.appendChild(previewimg);
 							var info = document.createElement('p');
 								var infotext = document.createTextNode(config.cmd.versioner[i].beskrivning);
 								info.appendChild(infotext);
 							rightcol.appendChild(info);
+							var button = document.createElement('a');
+								button.setAttribute('href', config.cmd.versioner[i].lank);
+								button.setAttribute('class', 'button');
+								button.setAttribute('target', '_blank');
+								var buttontext = document.createTextNode('Till sidan');
+								button.appendChild(buttontext);
+							rightcol.appendChild(button);
 						row.appendChild(rightcol);
 					container.appendChild(row);
 				wrapper.appendChild(container);
