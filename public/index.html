@@ -45,7 +45,7 @@
 	<script src="filer/config.js"></script>
 	<script type="text/javascript">
 		function load(){
-			var wrapper = document.getElementById('content');
+			var wrapper = document.getElementsByClassName('tablecontainer')[0];
 			config.cmd.versioner.reverse();
 			for (var i = config.cmd.versioner.length - 1; i >= 0; i--) {
 			/*
