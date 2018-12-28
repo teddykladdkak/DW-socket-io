@@ -45,7 +45,7 @@
 	<script src="filer/config.js"></script>
 	<script type="text/javascript">
 		function load(){
-			var wrapper = document.getElementsByClassName('tablecontainer')[0];
+			var wrapper = document.getElementById('content');
 			config.cmd.versioner.reverse();
 			for (var i = config.cmd.versioner.length - 1; i >= 0; i--) {
 			/*
@@ -85,7 +85,8 @@
 					</div>
 
 			*/
-				
+				var container = document.createElement('div');
+					container.setAttribute('class', 'tablecontainer information');
 					var row = document.createElement('div');
 						row.setAttribute('class', 'row');
 						var leftcol = document.createElement('div');
@@ -115,7 +116,8 @@
 								button.appendChild(buttontext);
 							rightcol.appendChild(button);
 						row.appendChild(rightcol);
-					wrapper.appendChild(row);
+					container.appendChild(row);
+				wrapper.appendChild(container);
 			};
 		};
 	</script>
