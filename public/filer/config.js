@@ -348,32 +348,32 @@ var config = {
 			namn: 'DW',
 			beskrivning: 'Whiteboard vyn.',
 			lank: '/dw.html',
-			img: 'dw.png'
+			img: 'dw.jpg'
 		},{
 			namn: 'DW-TODO',
 			beskrivning: 'Applikation som hanterar "Att göra" delen från DW. Visar Uppgifter och Kontroller. Möjlighet att läsa och redigera från DW.',
 			lank: '/todo.html',
-			img: 'todo.png'
+			img: 'todo.jpg'
 		},{
 			namn: 'DW-Vårdplats',
 			beskrivning: 'Sida som visar nuvarande platsläge. Visualiserar med färger beroende på om patient planeras hem, om den planeras hem idag, om den inte har ett planerat hemgångsdatum eller om sängen är tom.',
 			lank: '/vardplats.html',
-			img: 'vardplats.png'
+			img: 'vardplats.jpg'
 		},{
 			namn: 'DW-APP',
 			beskrivning: 'Mobil vyn av DW. OBS ännu inte färdig, kan enabrt ta mot informaiton från server, inte lägga till eller uppdatera befintlig information.',
 			lank: '/app.html',
-			img: 'app.png'
+			img: 'app.jpg'
 		},{
 			namn: 'DW-ADD',
 			beskrivning: 'Applikation som skickar patientdata till DW. Formulär som täcker allt förutom Uppgifter, Kontroller och Ikoner i DW. Kan enbart skicka, läser inget.',
 			lank: '/add.html',
-			img: 'add.png'
+			img: 'add.jpg'
 		},{
 			namn: 'DW-Admin',
 			beskrivning: 'Sida där det finns möjlighet att lägga till och ta bort användare, även ställa in behörigheter och lösenord.',
 			lank: '/admin.html',
-			img: 'admin.png'
+			img: 'admin.jpg'
 		}]
 	},
 	vardplats:{
