@@ -2,7 +2,7 @@ var nyheterflode = [
 	{
 	titel: 'Har har egentesterna startat',
 	datum: '2016-10-05',
-	text: 'Då det mesta på att göra-listan är klart, har jag nu börjat testa sidan, såklart hittar jag en mindre bugg direkt, man kan inte välja att sidan ska spara loggfil eller att sidan ska titta efter datum i mindre än var timme, alltså minuter funkar inte, detta är fixat på demosidan tills vidare, kommer läggas upp med källkoden när allt testande är klart. Testsidan är nu även upplaggd på teddyprojekt.tk, innan var den delad på dropbox, men eftersom dropbox inte längre stödjer "webbview" (man kan läsa filer som webbsidor) fick jag lösa det på detta sättet.'
+	text: 'Då det mesta på att göra-listan är klart, har jag nu börjat testa sidan, såklart hittar jag en mindre bugg direkt, man kan inte välja att sidan ska spara loggfil eller att sidan ska titta efter datum i mindre än var timme, alltså minuter funkar inte, detta är fixat på demosidan tills vidare, kommer läggas upp med källkoden när allt testande är klart. Testsidan är nu även upplaggd på teddyprojekt.se, innan var den delad på dropbox, men eftersom dropbox inte längre stödjer "webbview" (man kan läsa filer som webbsidor) fick jag lösa det på detta sättet.'
 	},{
 	titel: 'Steget längre med standard vårdplan',
 	datum: '2016-09-30',
